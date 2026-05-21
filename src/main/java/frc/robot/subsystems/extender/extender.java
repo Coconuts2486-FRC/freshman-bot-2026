@@ -1,6 +1,6 @@
 package frc.robot.subsystems.extender;
 
-import com.ctre.phoenix.Logger;
+import edu.wpi.first.units.measure.Velocity;
 import frc.robot.util.RBSISubsystem;
 
 public class extender extends RBSISubsystem {
@@ -13,7 +13,22 @@ public class extender extends RBSISubsystem {
 
   @Override
   protected void rbsiPeriodic() {
-    io.updateIntputs(inputs);
-    Logger.processInputs("extender", inputs);
+    io.updateInputs(inputs);
+  }
+
+  public double extenderPos() {
+    return io.extenderPos();
+  }
+
+  public void goToPos(double Pos) {
+    io.goToPos(Pos);
+  }
+
+  public void setVelocity(double Velocity) {
+    io.setVelocity(Velocity);
+  }
+
+  public void stop() {
+    io.stop();
   }
 }

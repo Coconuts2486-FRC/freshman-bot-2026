@@ -216,6 +216,8 @@ public final class Constants {
     public static final RobotDeviceId FLYWHEEL_LEADER = new RobotDeviceId(3, CANBuses.RIO, 8);
     public static final RobotDeviceId FLYWHEEL_FOLLOWER = new RobotDeviceId(4, CANBuses.RIO, 9);
 
+    public static final RobotDeviceId EXTENDER_MOTOR = new RobotDeviceId(42, CANBuses.RIO, 6);
+
     /* BEAM BREAK and/or LIMIT SWITCH DIO CHANNELS */
     // This is where digital I/O feedback devices are defined
     // Example:
