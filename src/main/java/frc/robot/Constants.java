@@ -235,6 +235,9 @@ public final class Constants {
     public static final RobotDeviceId CLIMB_MOTOR = new RobotDeviceId(20, CANBuses.DRIVE, 16);
     public static final RobotDeviceId CLIMB_ENCODER = new RobotDeviceId(21, CANBuses.DRIVE, null);
 
+    public static final RobotDeviceId EXTENDER_MOTOR = new RobotDeviceId(16, 2);
+    public static final RobotDeviceId EXTENDER_ENCODER = new RobotDeviceId(17, null);
+
     /* BEAM BREAK and/or LIMIT SWITCH DIO CHANNELS */
     // This is where digital I/O feedback devices are defined
     // Example:
