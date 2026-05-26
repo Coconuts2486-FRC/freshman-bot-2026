@@ -1,0 +1,349 @@
+Sam's Notes
+A more in-depth explanation can be found on the WPILIB docs
+docs.wpilib.org
+
+You can open the WPILib Command Palette using (cmd)+Shift+P or clicking on the logo at the top right
+Here you can build code, deploy code, test code, open tools, and a lot of other cool stuff
+
+Dashboards
+Shuffleboard - easily customizable dashboard controlled by coded widgets
+SmartDashBoard - Very simple and fast display
+Glass - Best for programming and sim
+AdvantageScope - best for diagnostics and  visualization
+Elastic - modernized shuffleboard alternative made by team 353
+
+
+Command Based:
+Command structure
+initialize() //runs one time after the command is scheduled
+execute() //called repeatedly while the command is scheduled or running
+end() //is called once when the command finishes or is interrupted used to wrap up or reset for next use
+isFinished() //ends the command when either returned or interrupted by another command
+getInterruptionBehavior() //when another command is called using the same systems this chooses if this command should be cancelled or the incoming one
+
+Command properties:
+getRequirments() //makes sure that no more than 1 command is using the same subsystem at the same time
+addRequirements() //declares requirements by overriding the getRequirements 
+runWhenDisabled() //declares whether the command may run once the robot is disabled (default false)
+kCancelIncoming //this makes it so the incoming command is aborted and the current one will continue to run
+runOnce() //I think this is self explanatory
+RunCommand() //calls run command lambda repeatedly until interrupted
+Commands.startEnd() //Runs one lambda command until interrupted when it runs another
+FunctionalCommand() // 
+repeatedly() //
+
+More Commands:
+Commands.print() //prints a string ending immediately
+WaitCommand() //wait for a time period
+WaitUntilCommand() //waits until a condition becomes true
+
+Example Command:
+Commands.run(intake::activate, intake);
+
+Command Files:
+public class ExampleCommand extends Command {
+  private final ExampleSubsystem m_subsystem;
+
+  public ExampleCommand(ExampleSubsystem subsystem) {
+    m_subsystem = subsystem;
+    addRequierments (subsystem);
+  }
+}
+
+Simple Command:
+public class Example extends Example {
+  private final ExampleSubsystem m_subsystem;
+
+  public Example(Example subsystem) {
+    m_exampleSubsystem = subsystem;
+    addRequierments(m_exampleSubsystem);
+  }
+
+  @Override 
+  public void initialize(){
+    m_exampleSubsystem.initExample();
+  }
+
+  @Overridepublic void execute(){
+    m_exampleSubsystem(...);
+  }
+
+  @Override
+  public boolean isFinished() {
+    return booleanExample;
+  }
+}
+
+Default Command:
+m_robotExample.setDefaultCommand(
+  Commands.run(
+    () ->
+      m_robotExample.exampleThing(...)
+  )
+);
+
+CommandSchedule:
+Sequence //Runs commands in a sequence top to bottom
+RepeatingSequence //Sequence runs repeatedly until interrupted
+Parallel //Runs commands at the same time
+Deadline //Runs commands at the same time until the top command is Finished
+Race //Runs commands at the same time until any command is Finished
+
+End Conditions:
+withTimeout() //Timer
+until() //BooleanSupplier
+
+Selection Factory:
+Selection //Choose between a couple command options based on sensor or data feedback
+public class RobotContainer {
+
+  private enum CommandSelector {
+    ONE,
+    TWO, 
+    THREE
+  }
+
+  private CommandSelector select(){
+    return CommandSelector.ONE;
+  }
+
+  private final Command m_exampleSelectCommand = 
+    new SelectCommand<>(
+      Map.ofEntries(
+        Map.ofEntries(CommandSelector.ONE, new PrintCommand("ONE was selected")),
+        Map.ofEntries(CommandSelector.TWO, new PrintCommand("TWO was selected")),
+        Map.ofEntries(CommandSelector.THREE, new PrintCommand("THREE was selected"))),
+        this::select);
+}
+
+Conditional Commands:
+new ConditionalCommand(commandOnTrue, commandOnFalse, m_limitSwitch::get)
+
+button.onTrue(command.unless(() -> !intake.isDeployed()));
+
+Scheduled Commands/Proxy Commands (Don't Use These Unless You're Sure):
+new ScheduleCommand(Commands.waitSeconds(5.0))
+.andThen(Commands.print("This will be printed immediately!"))
+
+Commands.sequence(
+  intake.inatkeGamePiece().asProxy, //Keeps intaking while processing
+  indexer.processGamePiece(),
+  shooter.aimAndShoot()
+);
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+Pathplanner in a Nutshell
+
+NamedCommands:
+NamedCommands.registerCommand(
+  "Example",
+  Commands.run(()-> m_example.setexample(...)
+)); //
+
+NamedCommands.registerCommand("Example", new ExampleCommand(...));
+
+Pathplanner paths are stored in the deploy tab
+You can use the pathplanner app for autos or you can use auto factory
+
+Use the same sequential and parallel rules as other commands
+
+Auto Factory Example:
+
+public class CoralTheRightWay implements Auto {
+    @Override
+    public Command getAutoCommand(RobotContainer robot) throws IOException, ParseException {
+        final SequentialCommandGroup commandGroup = new SequentialCommandGroup();
+
+        commandGroup.addCommands(
+                AutoBuilder.followPath(PathPlannerPath.fromPathFile("Start J")).asProxy());
+        commandGroup.addCommands(Commands.waitSeconds(0.8));
+        commandGroup.addCommands(AutoBuilder.followPath(PathPlannerPath.fromPathFile("Station J"))
+                .asProxy());
+        commandGroup.addCommands(Commands.waitSeconds(0.4));
+
+      
+                return commandGroup;
+    }
+
+    @Override
+    public Pose2d getStartingPoseAtBlueAlliance() {
+        return new Pose2d(7.235, 5.78, Rotation2d.fromDegrees(180));
+    }
+
+    }
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+WPI Simulator:
+To run simulator go to the same place you build code
+chose WPI: Simulate Robot Code then choose Sim GUI
+
+You should see a screen with a makeshift network tables, shuffleboard, smartdashboard and/or any other tools
+This screen is called Glass
+Open AdvantageScope and under the File Menu (Ctrl+Shift+K) press connect to Simulator
+
+On your simulator GUI their should be a couple tabs open
+On the left from top to bottom
+1 - Robot state (disabled/teleOp/Auto/ect)
+2 - Timer
+3 - System Joysticks (list of joysticks connected to your computer)
+4 - FMS
+in the middle
+5 - Network Tables
+6 - Joysticks (joysticks the robot code will pull from)
+on the right
+7 - other devices
+You may see other tabs like advantagekit, smartdashboard, or shuffleboard.
+
+To add a System Joystick to Joysticks drag the desired system joystick to the joysticks Menu
+Joystick 0 unassigned is default. You will have to manually map the gamepad in the simulator
+to do that go to the DS Menu you can also use keyboard with controls found in the DS Menu
+
+If the vendor libraries do not compile when simulating you can wrap their contents with RobotBase.isReal()
+
+Specialized widgets are available, but must first exist in the code
+example: Sendable Chooser (See pathplanner in a nutshell)
+You can add this to the smartdashboard
+
+LiveWindow Hardware: DigitalInput/DigitalOutput/SpeedContoller/Gyro
+You can also make a PID Controller widget which will allow you to quickly tune PID values
+EX: SmartDashBoard.putData("Elevator PID Controller", m_elevatorPIDController);
+
+You can also add a command selector/selection choice view to test commands with controller inputs
+The commandscheduler widget shows you the commands running
+
+Glass has a 2dField Widget so you can see your robots position
+(Also See AdvantageScope)
+To send the pose send the robot pose data from the odometry or pose estimator
+
+EX: private final Field2d m_field = new Field2d();
+SmartDashBoard.putData("Field", m_field);
+m_field.setRobotPose(m_odometry.getPoseMeters());
+
+You can also send trajectories to Field2d
+EX:
+  public void robotInit() {
+    // Create the trajectory to follow autonomously. It is best to initialize
+    // trajectories here to avoid wasting time autonomously.
+    m_trajectory =
+        TrajectoryGenerator.generateTrajectory(
+            new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+            List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+            new Pose2d(3, 0, Rotation2d.fromDegrees(0)),
+            new TrajectoryConfig(Units.feetToMeters(3.0), Units.feetToMeters(3.0)));
+
+    // Create and push Field2d to SmartDashboard.
+    m_field = new Field2d();
+    SmartDashboard.putData(m_field);
+
+    // Push the trajectory to Field2d.
+    m_field.getObject("traj").setTrajectory(m_trajectory);
+  }
+
+It is recommended to use these for AdvantageScope instead which has both 2D and 3D visualization
+
+Glass can show a representation of you robot's mechanisms using Mechanism2d
+It can rotate, extend, and retract.
+These can be used with a physics simulator such as the built in WPI sim or something like Maple Sim
+
+You can build the Mechanism using Mechanism2d
+The root node is where the object is anchored
+Mechanism mech = new Mechanism2d(3,3)
+MechanismRoot2d root = mech.getRoot("climber, 2, 0);
+
+To change length or angle use MechanismLigament2d
+setLength()/setAngle()
+
+EX:
+m_elevator.setLength(kElevatorMinimumLength+m_elevatorEncoder.getDistance());
+m_wrist.setAngle(m_wristPot.get());
+
+You can see the mechanism by sending it over to the smart dashboard and the Field
+You can also see the mechanisms with AdvantageScope
+
+
+
+WPI Physics Simulation options:
+Linear System, Flywheel, DifferentialDrivetrain, Elevator, SingleJointedArm, BatterySim
+WPI EX:
+private final ElavatorSim m_elvatorSim =
+  new ElevatorSim(
+    m_elevatorGearbox,
+    Constants.kElevatorGearing
+    Constants.kCarriageMass,
+    Constants.kElevatorDrumRadius,
+    Constants.kMinElevatorHeightMeters,
+    Constants.kMaxElevatorHeightMeters,
+    true,
+    0,
+    0.01,
+    0.0);
+
+
+  @Override
+  public void teleopPeriodic() {
+    if (m_joystick.getTrigger()) {
+      // Here, we set the constant setpoint of 0.75 meters.
+      m_elevator.reachGoal(Constants.kSetpointMeters);
+    } else {
+      // Otherwise, we update the setpoint to 0.
+      m_elevator.reachGoal(0.0);
+    }
+  }
+
+
+  public void reachGoal(double goal) {
+    m_controller.setGoal(goal);
+
+    // With the setpoint value we run PID control like normal
+    double pidOutput = m_controller.calculate(m_encoder.getDistance());
+    double feedforwardOutput = m_feedforward.calculate(m_controller.getSetpoint().velocity);
+    m_motor.setVoltage(pidOutput + feedforwardOutput);
+  }
+
+
+  public void simulationPeriodic() {
+    // In this method, we update our simulation of what our elevator is doing
+    // First, we set our "inputs" (voltages)
+    m_elevatorSim.setInput(m_motorSim.getSpeed() * RobotController.getBatteryVoltage());
+
+    // Next, we update it. The standard loop time is 20ms.
+    m_elevatorSim.update(0.020);
+
+    // Finally, we set our simulated encoder's readings and simulated battery voltage
+    m_encoderSim.setDistance(m_elevatorSim.getPositionMeters());
+    // SimBattery estimates loaded battery voltages
+    RoboRio Sim.setVIn Voltage(
+        BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
+  }
+
+WPI Device Simulation options:
+Encoder, Ultrasonic, ect. (I don't have the full list)
+
+WPI EX:
+// create a real encoder object on DIO 2,3
+Encoder encoder = new Encoder(2, 3);
+// create a sim controller for the encoder
+EncoderSim simEncoder = new EncoderSim(encoder);
+
+
+simEncoder.setCount(100);
+encoder.getCount(); // 100
+simEncoder.getCount(); // 100
+
+
+NotifyCallback callback = (String name, HALValue value) -> {
+  if (value.getType() == HALValue.kInt) {
+    System.out.println("Value of " + name + " is " + value.getInt());
+  }
+}
+CallbackStore store = simEncoder.registerCountCallback(callback);
+store.close(); // cancel the callback
+
+
+Drive Train
+
+
+AdvantageScope
+

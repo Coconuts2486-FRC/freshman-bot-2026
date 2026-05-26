@@ -1,0 +1,7 @@
+This directory contains files downloaded from the PhotonVision Orange Pi's.
+
+The camera calibration files should be updated here whenever the actual cameras
+are re-calibrated.
+
+The .zip files contain the settings of each Orange Pi, in the event of needing
+to switch to the backup camera box.

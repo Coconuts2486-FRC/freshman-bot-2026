@@ -38,8 +38,8 @@ public abstract class RBSISubsystem extends SubsystemBase {
   public final void periodic() {
     long start = System.nanoTime();
     rbsiPeriodic();
-    long end = System.nanoTime();
-    Logger.recordOutput("Loop/Mech/" + name + "_ms", (end - start) / 1e6);
+    // Log the timing for this subsystem
+    Logger.recordOutput("LogPeriodic/Subsystem/" + name + "MS", (System.nanoTime() - start) / 1e6);
   }
 
   /** Subclasses must implement this instead of periodic(). */
@@ -50,8 +50,5 @@ public abstract class RBSISubsystem extends SubsystemBase {
    *
    * @return Array of power distribution module ports
    */
-  public int[] getPowerPorts() {
-    int[] retval = {};
-    return retval;
-  }
+  protected abstract int[] getPowerPorts();
 }

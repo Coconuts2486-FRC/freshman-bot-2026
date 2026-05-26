@@ -82,7 +82,7 @@ public class CameraSweepEvaluator {
     return new Quaternion(c, ax * s, ay * s, az * s);
   }
 
-  // Hamilton product: q = a ⊗ b
+  // Hamilton product: q = a x b (cross-product)
   private static Quaternion quatMul(Quaternion a, Quaternion b) {
     double aw = a.getW(), ax = a.getX(), ay = a.getY(), az = a.getZ();
     double bw = b.getW(), bx = b.getX(), by = b.getY(), bz = b.getZ();
@@ -103,8 +103,8 @@ public class CameraSweepEvaluator {
    *
    * <p>Conventions: yawDeg = rotation about +Z (up), pitchDeg = rotation about +Y.
    *
-   * <p>Order: extra = yaw ⊗ pitch (yaw first, then pitch, both in the camera/base frame) combined =
-   * base ⊗ extra
+   * <p>Order: extra = yaw x pitch (yaw first, then pitch, both in the camera/base frame) combined =
+   * base x extra
    */
   private static Rotation3d composeCameraExtra(Rotation3d base, double yawDeg, double pitchDeg) {
     double yaw = Units.degreesToRadians(yawDeg);
@@ -146,7 +146,7 @@ public class CameraSweepEvaluator {
     // Sweep robot yaw at each location (degrees)
     double[] robotYawDeg = {-180, -135, -90, -45, 0, 45, 90, 135};
 
-    // Camera “extra” rotation sweep (applied on top of the mount rotation)
+    // Camera "extra" rotation sweep (applied on top of the mount rotation)
     double[] camYawDeg = {-15, 0, 15};
     double[] camPitchDeg = {-10, 0, 10};
 
@@ -242,7 +242,7 @@ public class CameraSweepEvaluator {
                               c1Q.getY(),
                               c1Q.getZ()));
 
-                      // Optional logging: keep it light (or decimate) so it doesn’t dominate
+                      // Optional logging: keep it light (or decimate) so it doesn't dominate
                       // runtime
                       Logger.recordOutput("CameraSweep/Score", score);
                     }

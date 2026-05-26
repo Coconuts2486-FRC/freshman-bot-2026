@@ -51,6 +51,12 @@ public class FieldState {
    *
    * @return Whether the team's alliance's HUB is active right now
    */
+  public static Alliance stationAlliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+
+  public static Alliance getAlliance() {
+    return stationAlliance;
+  }
+
   public static boolean isHubActive() {
 
     // The HUB is active for both alliances in AUTO

@@ -1,0 +1,57 @@
+Most used in a match:
+Drive, Rotate, Toggle rollers, Toggle pivot, X-drive, S-drive, 
+
+A map of all controls
+
+Change these controls based on how back buttons are bound
+
+    Driver Controls:
+A: Toggle intake down
+B: Toggle intake roller
+X: X-Lock
+Y: nothing for now
+D-Pad Up/Down: Nudge robot forwards/backwards
+D-Pad Left/right: Nudge robot to left/right
+Right Bumper: Passing shot
+Left Bumper: 
+Right Trigger: activates shooter to fire
+Left Trigger: auto points robot at hub
+Start: manualy re zero gyro
+Back: 
+Right Stick: Rotate or Strafe //Depending on if it's on Kate or Regular mode
+Left Stick: Strafe or Rotate
+Right Stick Button:
+Left Stick Button:
+
+Back Buttons:
+A = Bottom Right
+B = Top Right
+X = Top Left
+Y = Bottom Left
+
+=================================================================================
+    Co-Driver Controls:
+A: 
+B: climb up
+X: 
+Y: climb down
+D-Pad Up/Down:
+D-Pad Left: swtich to main tab
+D-Pad Right: switch to CAN tab
+Right Bumper:
+Left Bumper:
+Right Trigger: back up aiming control
+Left Trigger: back up shooting control
+Start: 
+Back:
+Right Stick:
+Left Stick:
+Right Stick Button:
+Left Stick Button:
+
+Back Buttons: //updated
+A = Bottom right
+B = Top left
+X = Bottom Left
+Y = Top Right
+

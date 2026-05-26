@@ -3,9 +3,15 @@
 // Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
-// Use of this source code is governed by a BSD
-// license that can be found in the AdvantageKit-License.md file
-// at the root directory of this project.
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// version 3 as published by the Free Software Foundation or
+// available in the root directory of this project.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
 //
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
@@ -18,9 +24,11 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -37,16 +45,37 @@ import frc.robot.Constants.CANBuses;
 import frc.robot.Constants.Cameras;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.FieldConstants.AprilTagLayoutType;
-import frc.robot.commands.AutopilotCommands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.PathAngleOverride;
 import frc.robot.subsystems.accelerometer.Accelerometer;
+import frc.robot.subsystems.coordinator.Coordinator;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveOdometry;
 import frc.robot.subsystems.drive.SwerveConstants;
-import frc.robot.subsystems.flywheel_example.Flywheel;
-import frc.robot.subsystems.flywheel_example.FlywheelIO;
-import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
+import frc.robot.subsystems.driver_info.Blinkin;
+import frc.robot.subsystems.driver_info.CANStatus;
+import frc.robot.subsystems.driver_info.MatchStatus;
+import frc.robot.subsystems.feeder.Feeder;
+import frc.robot.subsystems.feeder.FeederIO;
+import frc.robot.subsystems.feeder.FeederIOSim;
+import frc.robot.subsystems.feeder.FeederIOTalonFX;
 import frc.robot.subsystems.imu.Imu;
 import frc.robot.subsystems.imu.ImuIOSim;
+import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.indexer.IndexerIO;
+import frc.robot.subsystems.indexer.IndexerIOSim;
+import frc.robot.subsystems.indexer.IndexerIOTalonFX;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
+import frc.robot.subsystems.rollers.Rollers;
+import frc.robot.subsystems.rollers.RollersIO;
+import frc.robot.subsystems.rollers.RollersIOTalonFX;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterIO;
+import frc.robot.subsystems.shooter.ShooterIOSim;
+import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import frc.robot.subsystems.vision.CameraSweepEvaluator;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
@@ -66,7 +95,8 @@ import frc.robot.util.RBSIEnum.Mode;
 import frc.robot.util.RBSIPowerMonitor;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.photonvision.PhotonCamera;
 import org.photonvision.simulation.PhotonCameraSim;
@@ -79,6 +109,7 @@ public class RobotContainer {
   // Replace with ``CommandPS4Controller`` or ``CommandJoystick`` if needed
   final CommandXboxController driverController = new CommandXboxController(0); // Main Driver
 
+  final Blinkin blinkin = new Blinkin(0);
   final CommandXboxController operatorController = new CommandXboxController(1); // Second Operator
   final OverrideSwitches overrides = new OverrideSwitches(2); // Console toggle switches
 
@@ -90,12 +121,27 @@ public class RobotContainer {
   // These are the "Active Subsystems" that the robot controls
   private final Drive m_drivebase;
 
-  private final Flywheel m_flywheel;
+  // private final Flywheel m_flywheel;
+  private final Intake m_intake;
+  private final Indexer m_indexer;
+  private final Feeder m_feeder;
+  private final Shooter m_shooter;
+  private final Rollers m_rollers;
+  private final MatchStatus m_matchstatus;
+
+  private boolean elasticOnDriveTab = true;
+
+  @SuppressWarnings("unused")
+  private final Coordinator m_coordinator;
 
   // ... Add additional subsystems here (e.g., elevator, arm, etc.)
 
   // These are "Virtual Subsystems" that report information but have no motors
   private final Imu m_imu;
+  private final Vision m_vision;
+
+  @SuppressWarnings("unused")
+  private final DriveOdometry m_driveOdometry;
 
   @SuppressWarnings("unused")
   private final Accelerometer m_accel;
@@ -104,10 +150,10 @@ public class RobotContainer {
   private final RBSIPowerMonitor m_power;
 
   @SuppressWarnings("unused")
-  private final Vision m_vision;
+  private List<RBSICANHealth> m_canHealth;
 
   @SuppressWarnings("unused")
-  private List<RBSICANHealth> canHealth;
+  private final CANStatus m_canStatus;
 
   /** Dashboard inputs ***************************************************** */
   // AutoChoosers for both supported path planning types
@@ -128,35 +174,53 @@ public class RobotContainer {
   // Alerts
   private final Alert aprilTagLayoutAlert = new Alert("", AlertType.INFO);
 
-  // Vision Factories
-  private VisionIO[] buildVisionIOsReal(Drive drive) {
-    return switch (Constants.getVisionType()) {
-      case PHOTON ->
-          Arrays.stream(Cameras.ALL)
-              .map(c -> (VisionIO) new VisionIOPhotonVision(c.name(), c.robotToCamera()))
-              .toArray(VisionIO[]::new);
+  public void defineAutoCommands() {
 
-      case LIMELIGHT ->
-          Arrays.stream(Cameras.ALL)
-              .map(c -> (VisionIO) new VisionIOLimelight(c.name(), drive::getHeading))
-              .toArray(VisionIO[]::new);
+    NamedCommands.registerCommand("IntakeDown", Commands.run(() -> m_intake.pivotDown(), m_intake));
 
-      case NONE -> new VisionIO[] {new VisionIO() {}};
-    };
-  }
+    NamedCommands.registerCommand(
+        "Intake",
+        Commands.run(() -> m_rollers.runRollers(), m_rollers).finallyDo(() -> m_rollers.stop()));
 
-  private static VisionIO[] buildVisionIOsSim(Drive drive) {
-    var cams = Constants.Cameras.ALL;
-    VisionIO[] ios = new VisionIO[cams.length];
-    for (int i = 0; i < cams.length; i++) {
-      var cfg = cams[i];
-      ios[i] = new VisionIOPhotonVisionSim(cfg.name(), cfg.robotToCamera(), drive::getPose);
-    }
-    return ios;
-  }
+    NamedCommands.registerCommand(
+        "Shoot",
+        Commands.run(
+                () -> m_shooter.runVelocityRPM((Coordinator.getEpicShooterVelocity())), m_shooter)
+            .finallyDo(() -> m_shooter.stop()));
 
-  private VisionIO[] buildVisionIOsReplay() {
-    return new VisionIO[] {new VisionIO() {}};
+    NamedCommands.registerCommand(
+        "ShootOnTheMove",
+        Commands.run(
+                () -> {
+                  if (Coordinator.isAimedAtTarget(10.0)) {
+                    m_shooter.runVelocityRPM(Coordinator.getEpicShooterVelocity());
+                  } else {
+                    m_shooter.stop();
+                  }
+                },
+                m_shooter)
+            .finallyDo(() -> m_shooter.stop()));
+
+    NamedCommands.registerCommand(
+        "Feed",
+        Commands.run(() -> m_shooter.runVelocityRPM((4500)), m_shooter)
+            .finallyDo(() -> m_shooter.stop()));
+
+    NamedCommands.registerCommand(
+        "Align",
+        DriveCommands.fieldRelativeDriveAtAngle(
+            m_drivebase, () -> 0.0, () -> 0.0, Coordinator::getRobotAngle));
+
+    NamedCommands.registerCommand(
+        "EnableShootOnMove",
+        Commands.runOnce(
+            () -> PathAngleOverride.setOverride(() -> Optional.of(Coordinator.getRobotAngle()))));
+
+    NamedCommands.registerCommand(
+        "DisableShootOnMove", Commands.runOnce(PathAngleOverride::clearOverride));
+
+    NamedCommands.registerCommand(
+        "Zero", Commands.runOnce(m_drivebase::zeroHeadingForAlliance, m_drivebase));
   }
 
   /**
@@ -178,10 +242,21 @@ public class RobotContainer {
         m_imu = new Imu(SwerveConstants.kImu.factory.get());
 
         m_drivebase = new Drive(m_imu);
-        m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
-        m_vision = new Vision(m_drivebase::addVisionMeasurement, buildVisionIOsReal(m_drivebase));
+        m_driveOdometry = new DriveOdometry(m_drivebase, m_imu, m_drivebase.getModules());
+        m_vision =
+            new Vision(
+                m_drivebase, m_drivebase::addVisionMeasurement, buildVisionIOsReal(m_drivebase));
+        // m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
         m_accel = new Accelerometer(m_imu);
+        m_intake = new Intake(new IntakeIOTalonFX());
+        m_indexer = new Indexer(new IndexerIOTalonFX());
+        m_feeder = new Feeder(new FeederIOTalonFX());
+        m_shooter = new Shooter(new ShooterIOTalonFX());
+        m_rollers = new Rollers(new RollersIOTalonFX());
+        m_matchstatus = new MatchStatus(driverController, operatorController, blinkin);
+
         sweep = null;
+
         break;
 
       case SIM:
@@ -189,29 +264,28 @@ public class RobotContainer {
 
         m_imu = new Imu(new ImuIOSim());
         m_drivebase = new Drive(m_imu);
-        m_flywheel = new Flywheel(new FlywheelIOSim());
-
-        // ---------------- Vision IOs (robot code) ----------------
-        var cams = frc.robot.Constants.Cameras.ALL;
-
-        // If you keep Vision expecting exactly two cameras:
-        VisionIO[] visionIOs = buildVisionIOsSim(m_drivebase);
-        m_vision = new Vision(m_drivebase::addVisionMeasurement, visionIOs);
-
+        m_driveOdometry = new DriveOdometry(m_drivebase, m_imu, m_drivebase.getModules());
+        m_vision =
+            new Vision(
+                m_drivebase, m_drivebase::addVisionMeasurement, buildVisionIOsSim(m_drivebase));
+        // m_flywheel = new Flywheel(new FlywheelIOSim() {});
         m_accel = new Accelerometer(m_imu);
+        m_intake = new Intake(new IntakeIOSim());
+        m_indexer = new Indexer(new IndexerIOSim());
+        m_feeder = new Feeder(new FeederIOSim());
+        m_shooter = new Shooter(new ShooterIOSim());
+        m_rollers = new Rollers(new RollersIOTalonFX());
+        m_matchstatus = new MatchStatus(driverController, operatorController, blinkin);
 
-        // ---------------- CameraSweepEvaluator (sim-only analysis) ----------------
+        // CameraSweepEvaluator (sim-only analysis)
         VisionSystemSim visionSim = new VisionSystemSim("CameraSweepWorld");
         visionSim.addAprilTags(FieldConstants.aprilTagLayout);
-
+        var cams = Cameras.ALL;
         PhotonCameraSim[] simCams = new PhotonCameraSim[cams.length];
-
         for (int i = 0; i < cams.length; i++) {
           var cfg = cams[i];
-
           PhotonCamera photonCam = new PhotonCamera(cfg.name());
           PhotonCameraSim camSim = new PhotonCameraSim(photonCam, cfg.simProps());
-
           visionSim.addCamera(camSim, cfg.robotToCamera());
           simCams[i] = camSim;
         }
@@ -230,21 +304,45 @@ public class RobotContainer {
         RBSICANBusRegistry.initSim(CANBuses.RIO, CANBuses.DRIVE);
         m_imu = new Imu(new ImuIOSim() {});
         m_drivebase = new Drive(m_imu);
-        m_flywheel = new Flywheel(new FlywheelIO() {});
-        m_vision = new Vision(m_drivebase::addVisionMeasurement, buildVisionIOsReplay());
+        m_driveOdometry = new DriveOdometry(m_drivebase, m_imu, m_drivebase.getModules());
+        m_vision =
+            new Vision(
+                m_drivebase, m_drivebase::addVisionMeasurement, buildVisionIOsReplay(m_drivebase));
+
+        // m_flywheel = new Flywheel(new FlywheelIO() {});
         m_accel = new Accelerometer(m_imu);
         sweep = null;
+        m_intake = new Intake(new IntakeIO() {});
+        m_indexer = new Indexer(new IndexerIO() {});
+        m_feeder = new Feeder(new FeederIO() {});
+        m_shooter = new Shooter(new ShooterIO() {});
+        m_rollers = new Rollers(new RollersIO() {});
+        m_matchstatus = new MatchStatus(driverController, operatorController, blinkin);
+
         break;
     }
 
     // Init all CAN busses specified in the `Constants.CANBuses` class
     RBSICANBusRegistry.initReal(Constants.CANBuses.ALL);
-    canHealth = Arrays.stream(Constants.CANBuses.ALL).map(RBSICANHealth::new).toList();
+    m_canHealth = Arrays.stream(Constants.CANBuses.ALL).map(RBSICANHealth::new).toList();
+    m_canStatus =
+        new CANStatus(m_drivebase, m_imu, m_intake, m_feeder, m_rollers, m_shooter, m_indexer);
 
     // In addition to the initial battery capacity from the Dashbaord, ``RBSIPowerMonitor`` takes
     // all the non-drivebase subsystems for which you wish to have power monitoring; DO NOT
     // include ``m_drivebase``, as that is automatically monitored.
-    m_power = new RBSIPowerMonitor(batteryCapacity, m_flywheel);
+    m_power = new RBSIPowerMonitor(batteryCapacity, m_intake, m_indexer, m_feeder, m_shooter);
+
+    // Build the coordinator
+    m_coordinator =
+        new Coordinator(
+            m_drivebase::getPose,
+            m_drivebase::getFieldLinearVelocity,
+            m_rollers::isIntakeRollersRunning,
+            m_intake::isIntakeExtended);
+
+    // Define Auto commands
+    defineAutoCommands();
 
     // Set up the SmartDashboard Auto Chooser based on auto type
     switch (Constants.getAutoType()) {
@@ -260,9 +358,29 @@ public class RobotContainer {
       case PATHPLANNER:
         autoChooserPathPlanner =
             new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+        PPHolonomicDriveController.setRotationTargetOverride(PathAngleOverride::getOverride);
+
         // Set the others to null
         autoChooserChoreo = null;
         autoFactoryChoreo = null;
+
+        // Set up the logging callback
+        PathPlannerLogging.setLogActivePathCallback(
+            (List<Pose2d> activePath) -> {
+              Logger.recordOutput("PathPlanner/ActivePath", activePath.toArray(new Pose2d[0]));
+            });
+
+        PathPlannerLogging.setLogCurrentPoseCallback(
+            (Pose2d currentPose) -> {
+              Logger.recordOutput("PathPlanner/CurrentPose", currentPose);
+            });
+
+        PathPlannerLogging.setLogTargetPoseCallback(
+            (Pose2d targetPose) -> {
+              Logger.recordOutput("PathPlanner/TargetPose", targetPose);
+            });
+
         break;
 
       case CHOREO:
@@ -291,8 +409,6 @@ public class RobotContainer {
     driveStyle.addDefaultOption("TANK", DriveStyle.TANK);
     driveStyle.addOption("GAMER", DriveStyle.GAMER);
 
-    // Define Auto commands
-    defineAutoCommands();
     // Define SysIs Routines
     definesysIdRoutines();
     // Configure the button and trigger bindings
@@ -300,10 +416,6 @@ public class RobotContainer {
   }
 
   /** Use this method to define your Autonomous commands for use with PathPlanner / Choreo */
-  private void defineAutoCommands() {
-
-    // NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
-  }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -331,6 +443,7 @@ public class RobotContainer {
         turnStickX = driverController::getRightX;
     }
 
+    // =======================================================================
     // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
@@ -339,80 +452,192 @@ public class RobotContainer {
             () -> -driveStickX.value(),
             () -> -turnStickX.value()));
 
-    // ** Example Commands -- Remap, remove, or change as desired **
-    // Press B button while driving --> ROBOT-CENTRIC
-    driverController
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                () ->
-                    DriveCommands.robotRelativeDrive(
-                        m_drivebase,
-                        () -> -driveStickY.value(),
-                        () -> -driveStickX.value(),
-                        () -> turnStickX.value()),
-                m_drivebase));
+    // =======================================================================
+    // Set DEFAULT COMMANDS for subsystems
+    m_indexer.setDefaultCommand(
+        // Get the running states of intake rollers & feeder.  Set the indexer to run if
+        // either input is true.
+        Commands.run(
+            () -> {
+              if (m_feeder.isFeederRunning()) {
+                m_indexer.setVelocity(-0.8);
+              } else if (m_shooter.shooterAlmostAtSpeed()) {
+                m_indexer.setVelocity(-0.5);
+              } else {
+                m_indexer.indexerStop();
+              }
+            },
+            m_indexer));
 
-    // Press A button -> BRAKE
-    driverController
-        .a()
-        .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
+    m_feeder.setDefaultCommand(
+        Commands.run(
+            () -> {
+              if (m_shooter.shooterAtSpeed()) {
+                m_feeder.runFeeder();
+              } else {
+                m_feeder.stopFeeder();
+              }
+            },
+            m_feeder));
+
+    m_shooter.setDefaultCommand(
+        Commands.run(
+            () -> {
+              m_shooter.stop();
+            },
+            m_shooter));
+
+    m_rollers.setDefaultCommand(
+        Commands.run(
+            () -> {
+              m_rollers.stop();
+            },
+            m_rollers));
+
+    // driver controls
 
     // Press X button --> Stop with wheels in X-Lock position
     driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
-    // Press Y button --> Manually Re-Zero the Gyro
+    // Press Start button --> Manually Re-Zero the Gyro
     driverController
-        .y()
+        .start()
         .onTrue(
             Commands.runOnce(m_drivebase::zeroHeadingForAlliance, m_drivebase)
                 .ignoringDisable(true));
 
-    // Press RIGHT BUMPER --> Run the example flywheel
+    /*there is a default command in intake that makes it go up this toggles a new command
+    that cancels the default and keeps the intake down with out the driver having to hold any button */
+    driverController.a().toggleOnTrue(Commands.run(() -> m_intake.pivotDown(), m_intake));
+
+    driverController.b().toggleOnTrue(Commands.run(() -> m_rollers.runRollers(), m_rollers));
+
+    // shooter feeding
     driverController
         .rightBumper()
         .whileTrue(
-            Commands.startEnd(
-                () -> m_flywheel.runVelocity(flywheelSpeedInput.get()),
-                m_flywheel::stop,
-                m_flywheel));
+            Commands.run(() -> m_shooter.runVelocityRPM((4500)), m_shooter)
+                .alongWith(Commands.run(() -> m_rollers.feedRollers(), m_rollers)));
 
-    // Press LEFT BUMPER --> Drive to a pose 10 feet closer to the BLUE ALLIANCE wall
+    // epic solution
+    driverController
+        .rightTrigger()
+        .whileTrue(
+            Commands.run(
+                    () -> m_shooter.runVelocityRPM((Coordinator.getEpicShooterVelocity())),
+                    m_shooter)
+                .alongWith(Commands.run(() -> m_rollers.feedRollers(), m_rollers)));
+
+    // auto aim - turn only, driver keeps translational control
+    driverController
+        .leftTrigger()
+        .whileTrue(
+            DriveCommands.fieldRelativeDriveAtAngle(
+                m_drivebase,
+                () -> -driveStickY.value(),
+                () -> -driveStickX.value(),
+                () -> {
+                  Pose2d robotPose = m_drivebase.getPose();
+                  return FieldConstants.hubCenter2d()
+                      .minus(robotPose.getTranslation())
+                      .getAngle()
+                      .plus(Rotation2d.fromDegrees(180));
+                }));
+
+    // toggle aim at hub
     driverController
         .leftBumper()
+        .toggleOnTrue(
+            DriveCommands.fieldRelativeDriveAtAngle(
+                m_drivebase,
+                () -> -driveStickY.value() * 0.75,
+                () -> -driveStickX.value() * 0.75,
+                Coordinator::getRobotAngle));
+
+    driverController
+        .povUp()
         .whileTrue(
-            Commands.defer(
+            Commands.run(
                 () -> {
-                  // New pose 2 feet closer to BLUE ALLIANCE wall
-                  Pose2d pose =
-                      m_drivebase
-                          .getPose()
-                          .transformBy(
-                              new Transform2d(Units.feetToMeters(-10.0), 0.0, Rotation2d.kZero));
-
-                  // Alternatively, you could define a pose in a separate module and call it here.
-                  //
-                  // Example from 2025 Reefscape:
-                  // --------
-                  // pose = ReefPoses.kBluePoleE;
-
-                  return AutopilotCommands.runAutopilot(m_drivebase, pose);
+                  m_drivebase.runVelocity(
+                      new ChassisSpeeds(Units.inchesToMeters(-16), Units.inchesToMeters(0), 0));
                 },
-                Set.of(m_drivebase)));
+                m_drivebase));
 
-    // Press POV LEFT to nudge the robot left
+    driverController
+        .povDown()
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  m_drivebase.runVelocity(
+                      new ChassisSpeeds(Units.inchesToMeters(16), Units.inchesToMeters(0), 0));
+                },
+                m_drivebase));
+
+    // micro driving controls
+    driverController
+        .povRight()
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  m_drivebase.runVelocity(
+                      new ChassisSpeeds(Units.inchesToMeters(0.), Units.inchesToMeters(-20.0), 0.));
+                },
+                m_drivebase));
+
     driverController
         .povLeft()
         .whileTrue(
-            Commands.startEnd(
+            Commands.run(
                 () -> {
                   m_drivebase.runVelocity(
-                      new ChassisSpeeds(Units.inchesToMeters(0.), Units.inchesToMeters(11.0), 0.));
+                      new ChassisSpeeds(Units.inchesToMeters(0.), Units.inchesToMeters(20.0), 0.));
                 },
-                // Stop when command ended
-                m_drivebase::stop,
                 m_drivebase));
 
+    driverController
+        .y()
+        .whileTrue(
+            Commands.run(() -> m_indexer.setVelocity(0.8), m_indexer)
+                .alongWith(Commands.run(() -> m_rollers.reverseRollers(), m_rollers))
+                .alongWith(Commands.run(() -> m_feeder.reverseFeeder(), m_feeder)));
+
+    driverController.x().whileTrue(Commands.run(() -> m_intake.printPos()));
+
+    //
+    // ===============================================================================
+
+    // Co driver controls
+
+    // Press start button --> switch elastic tab
+    operatorController
+        .povRight()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  Elastic.selectTab(1);
+                }));
+
+    operatorController
+        .povLeft()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  Elastic.selectTab(0);
+                }));
+
+    operatorController.povDown().whileTrue(Commands.run(() -> m_intake.printPos()));
+
+    // operatorController.povUp().onTrue(Commands.runOnce(() -> m_shooter.incrementOffset(0.075)));
+    // operatorController.povDown().onTrue(Commands.runOnce(() ->
+    // m_shooter.incrementOffset(-0.075)));
+
+    operatorController.b().toggleOnTrue(Commands.run(() -> m_intake.stopPivot()));
+
+    operatorController.a().whileTrue(Commands.run(() -> m_indexer.setVelocity(0.37), m_indexer));
+
+    // ==============================================================================================================================
+    // sim controls
     if (Constants.getMode() == Mode.SIM) {
       // IN SIMULATION ONLY:
       // Double-press the A button on Joystick3 to run the CameraSweepEvaluator
@@ -478,7 +703,8 @@ public class RobotContainer {
   /** Updates the alerts. */
   public void updateAlerts() {
     // AprilTag layout alert
-    boolean aprilTagAlertActive = Constants.getAprilTagLayoutType() != AprilTagLayoutType.OFFICIAL;
+    boolean aprilTagAlertActive =
+        Constants.getAprilTagLayoutType() != AprilTagLayoutType.REBUILT_WELDED;
     aprilTagLayoutAlert.set(aprilTagAlertActive);
     if (aprilTagAlertActive) {
       aprilTagLayoutAlert.setText(
@@ -491,6 +717,11 @@ public class RobotContainer {
   /** Drivetrain getter method for use with Robot.java */
   public Drive getDrivebase() {
     return m_drivebase;
+  }
+
+  /** Vision getter method for use with Robot.java */
+  public Vision getVision() {
+    return m_vision;
   }
 
   /**
@@ -522,18 +753,65 @@ public class RobotContainer {
 
       // Example Flywheel SysId Characterization
       autoChooserPathPlanner.addOption(
-          "Flywheel SysId (Quasistatic Forward)",
-          m_flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+          "Shooter SysId (Quasistatic Forward)",
+          m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
       autoChooserPathPlanner.addOption(
-          "Flywheel SysId (Quasistatic Reverse)",
-          m_flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+          "Shooter SysId (Quasistatic Reverse)",
+          m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
       autoChooserPathPlanner.addOption(
-          "Flywheel SysId (Dynamic Forward)",
-          m_flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
+          "Shooter SysId (Dynamic Forward)",
+          m_shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
       autoChooserPathPlanner.addOption(
-          "Flywheel SysId (Dynamic Reverse)",
-          m_flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+          "Shooter SysId (Dynamic Reverse)",
+          m_shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     }
+  }
+
+  // Vision Factories
+  // Vision Factories (REAL)
+  private VisionIO[] buildVisionIOsReal(Drive drive) {
+    return switch (Constants.getVisionType()) {
+      case PHOTON ->
+          Arrays.stream(Constants.Cameras.ALL)
+              .map(c -> (VisionIO) new VisionIOPhotonVision(c.name(), c.robotToCamera()))
+              .toArray(VisionIO[]::new);
+
+      case LIMELIGHT ->
+          Arrays.stream(Constants.Cameras.ALL)
+              .map(c -> (VisionIO) new VisionIOLimelight(c.name(), drive::getHeading))
+              .toArray(VisionIO[]::new);
+
+      case NONE -> new VisionIO[] {}; // recommended: no cameras
+    };
+  }
+
+  // Vision Factories (SIM)
+  private VisionIO[] buildVisionIOsSim(Drive drive) {
+    var cams = Constants.Cameras.ALL;
+    VisionIO[] ios = new VisionIO[cams.length];
+    for (int i = 0; i < cams.length; i++) {
+      var cfg = cams[i];
+      ios[i] = new VisionIOPhotonVisionSim(cfg.name(), cfg.robotToCamera(), drive::getPose);
+    }
+    return ios;
+  }
+
+  // Vision Factories (REPLAY)
+  private VisionIO[] buildVisionIOsReplay(Drive drive) {
+    var cams = Constants.Cameras.ALL;
+
+    VisionIO[] ios = new VisionIO[cams.length];
+    for (int i = 0; i < cams.length; i++) {
+      ios[i] =
+          new VisionIO() {
+            @Override
+            public void updateInputs(VisionIOInputs inputs) {
+              // Intentionally empty.
+              // Logger.processInputs("Vision/Camera" + i, inputs) will populate these from the log.
+            }
+          };
+    }
+    return ios;
   }
 
   /**
