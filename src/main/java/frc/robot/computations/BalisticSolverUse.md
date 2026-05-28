@@ -106,10 +106,10 @@ So it’s appropriate in:
 
 Below is a practical, WPILib-idiomatic way to do both:
 
-1. Smooth v0 and psi frame-to-frame (handles discontinuities, noise, and “aim jitter”)
+1. Smooth v0 and psi frame-to-frame (handles discontinuities, noise, and "aim jitter")
 2. Wire it into a Command-based auto-aim example you can drop into an FRC project.
 
-Everything is written to be “robot-code friendly” (no fancy dependencies, deterministic, tunable).
+Everything is written to be "robot-code friendly" (no fancy dependencies, deterministic, tunable).
 
 ### Smoothing strategy
 
@@ -133,7 +133,7 @@ Angles wrap at ±π. You **must** smooth using angle error:
 Optionally add a **slew-rate limiter** so aim commands don’t jump faster than your turret can physically follow.
 
 
-### A small reusable “smoothed setpoint” helper
+### A small reusable "smoothed setpoint" helper
 
     import edu.wpi.first.math.MathUtil;
     import edu.wpi.first.math.geometry.Rotation2d;
@@ -349,7 +349,7 @@ Example: run while a driver button is held.
 
 ### Practical tuning notes (what usually matters)
 
-If the turret “hunts” left/right:
+If the turret "hunts" left/right:
 * increase `tauSeconds` (more smoothing), or
 * lower `maxPsiRateRadPerS`
 

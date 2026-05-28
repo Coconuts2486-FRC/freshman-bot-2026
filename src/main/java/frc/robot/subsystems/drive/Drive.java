@@ -438,7 +438,7 @@ public class Drive extends RBSISubsystem {
       double yawRateRadPerSec,
       SwerveModulePosition[] odomPositions) {
 
-    // Don’t end coast “instantly” right after disable edge
+    // Don’t end coast "instantly" right after disable edge
     final double minCoastTime = 0.25; // seconds -- maybe put into Constants???
     final boolean pastMin = (now - disabledCoastStartTs) >= minCoastTime;
 
@@ -791,7 +791,7 @@ public class Drive extends RBSISubsystem {
         final double coastAge = t - getDisabledCoastStartTs();
         // Logger.recordOutput("Vision/Debug/disabledCoastAge", coastAge);
 
-        // Ignore vision briefly right after ENABLE->DISABLE (prevents “phase mismatch” at disable
+        // Ignore vision briefly right after ENABLE->DISABLE (prevents "phase mismatch" at disable
         // edge)
         if (coastAge >= 0.0 && coastAge < DrivebaseConstants.kDisabledVisionIgnoreAfterDisableSec) {
           // Logger.recordOutput("Vision/Debug/disabledIgnoreEarlyCoast", true);

@@ -2,8 +2,14 @@ package frc.robot.subsystems.extender;
 
 import static frc.robot.Constants.RobotDevices.*;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
 
 public class ExtenderIOTalonFX implements ExtenderIO {
   private final TalonFX extenderMotor =
@@ -11,8 +17,21 @@ public class ExtenderIOTalonFX implements ExtenderIO {
   private final CANcoder extenderEncoder =
       new CANcoder(EXTENDER_ENCODER.getDeviceNumber(), EXTENDER_ENCODER.getCANBus());
 
+  private final StatusSignal<Angle> extenderPosition = null;
+  private final StatusSignal<AngularVelocity> extenderVelocity = null;
+  private final StatusSignal<Voltage> extenderAppliedVolts = null;
+  private final StatusSignal<Current> extenderCurrent = null;
+
   @Override
   public void stop() {
     extenderMotor.stopMotor();
+  }
+
+  @Override
+  public void updateInputs(ExtenderIOInputs inputs) {
+
+    var extenderStatus =
+        BaseStatusSignal.refreshAll(
+            extenderPosition, extenderVelocity, extenderAppliedVolts, extenderCurrent);
   }
 }

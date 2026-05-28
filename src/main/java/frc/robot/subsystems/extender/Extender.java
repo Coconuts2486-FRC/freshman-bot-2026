@@ -17,7 +17,7 @@ public class Extender extends RBSISubsystem {
   }
 
   public double extenderPos() {
-    return io.extenderPos();
+    return io.getPos();
   }
 
   public void goToPos(double Pos) {
@@ -30,6 +30,10 @@ public class Extender extends RBSISubsystem {
 
   public void stop() {
     io.stop();
+  }
+
+  public boolean isExtenderAlive() {
+    return inputs.extenderConected;
   }
 
   // * power port fucntion */

@@ -10,11 +10,12 @@ public interface ExtenderIO extends RBSIIO {
     public double velocityRadPerSec = 0.0;
     public double appliedVolts = 0.0;
     public double[] currentAmps = new double[] {};
+    public boolean extenderConected = false;
   }
 
   public default void updateInputs(ExtenderIOInputs inputs) {}
 
-  public default double extenderPos() {
+  public default double getPos() {
     return 0.0;
   }
 

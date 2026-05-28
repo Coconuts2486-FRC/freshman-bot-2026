@@ -47,7 +47,7 @@ public abstract class VirtualSubsystem {
     if (needsSort) {
       subsystems.sort(
           Comparator.comparingInt(VirtualSubsystem::getPeriodPriority)
-              // deterministic tie-break to avoid “random” order when priorities match
+              // deterministic tie-break to avoid "random" order when priorities match
               .thenComparingInt(System::identityHashCode));
       needsSort = false;
     }

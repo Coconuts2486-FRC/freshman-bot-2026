@@ -163,7 +163,7 @@ public class Vision extends VirtualSubsystem {
         Logger.processInputs("Vision/Camera" + i, inputs[i]);
       }
 
-      // Always-on “health” debug -- may consider removing this
+      // Always-on "health" debug -- may consider removing this
       // Logger.recordOutput("Vision/Debug/ioLength", io.length);
       // int totalObs = 0;
       // for (int i = 0; i < io.length; i++) {
@@ -290,7 +290,7 @@ public class Vision extends VirtualSubsystem {
 
       // Log everything on our way out of this function
 
-      // Always-present “outputs”
+      // Always-present "outputs"
       Logger.recordOutput("Vision/FusedPose", lastFusedPose);
       Logger.recordOutput("Vision/SmoothedPose", lastSmoothedPose);
       Logger.recordOutput("Vision/FusedTimestamp", lastFusedTs);

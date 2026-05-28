@@ -42,16 +42,11 @@ public class Coordinator extends VirtualSubsystem {
   public enum Mode {
     SYSTEM_CHECK, // Disabled, pre-match
     IDLE, // Disabled, playing defense, climb
-    INTAKE, // Filling the hopper
-    SCORE, // Shooting FUEL to the HUB
-    PASS, // Shooting FUEL to our alliance zone
     CLIMB // Climbing
   }
 
   private final Supplier<Pose2d> poseSupplier;
   private final Supplier<Translation2d> velocitySupplier;
-  private final Supplier<Boolean> intakeRollersRunningSupplier;
-  private final Supplier<Boolean> intakeExtendedSupplier;
   private Mode mode = Mode.IDLE;
 
   // Instantiate loop variables
@@ -61,7 +56,6 @@ public class Coordinator extends VirtualSubsystem {
   private Translation2d velocity;
   private Alliance alliance = Alliance.Blue;
   private boolean allianceSet = false;
-  boolean intakeRunning;
   boolean runOnceDisabled = true;
 
   // Internal variables
@@ -81,15 +75,9 @@ public class Coordinator extends VirtualSubsystem {
   private Zones zone;
 
   /** Constructor */
-  public Coordinator(
-      Supplier<Pose2d> poseSupplier,
-      Supplier<Translation2d> velocitySupplier,
-      Supplier<Boolean> intakeRollersRunningSupplier,
-      Supplier<Boolean> intakeExtendedSupplier) {
+  public Coordinator(Supplier<Pose2d> poseSupplier, Supplier<Translation2d> velocitySupplier) {
     this.poseSupplier = poseSupplier;
     this.velocitySupplier = velocitySupplier;
-    this.intakeRollersRunningSupplier = intakeRollersRunningSupplier;
-    this.intakeExtendedSupplier = intakeExtendedSupplier;
   }
 
   public void setMode(Mode mode) {
@@ -192,9 +180,6 @@ public class Coordinator extends VirtualSubsystem {
     physicsSolution =
         FieldRelativeShooterSolver.solve(new Pose3d(pose), kShooterTransform, target, velocity);
 
-    // Check on intake roller running
-    intakeRunning = intakeRollersRunningSupplier.get();
-
     // 2) State machine / mode logic
     switch (mode) {
       case IDLE -> {
@@ -212,14 +197,6 @@ public class Coordinator extends VirtualSubsystem {
       //   }
       // }
 
-      case SCORE -> {
-        // Example: require "aimed + shooter ready" then feed
-      }
-
-      case INTAKE -> {
-        // intake logic
-      }
-
       case CLIMB -> {
         // climb logic
       }
@@ -234,7 +211,6 @@ public class Coordinator extends VirtualSubsystem {
     // But really do this based on calculating things!
     // Based on field position, HUB active, turret in position, flywheel at speed, override not set,
     // "DON'T SHOOT" button not pressed...
-    ok_to_shoot = true;
 
     // double dist2hub = pose.minus(pose);
 
