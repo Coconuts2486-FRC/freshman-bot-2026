@@ -117,7 +117,7 @@ public class SwerveConstants {
         kCoupleRatio = t.frontLeft().CouplingGearRatio;
         kDriveGearRatio = t.frontLeft().DriveMotorGearRatio;
         kSteerGearRatio = t.frontLeft().SteerMotorGearRatio;
-        kCANbusName = CANBuses.DRIVE;
+        kCANbusName = CANBuses.RIO;
         kPigeonId = t.drivetrain().Pigeon2Id;
         kSteerInertia = t.frontLeft().SteerInertia;
         kDriveInertia = t.frontLeft().DriveInertia;
@@ -125,7 +125,7 @@ public class SwerveConstants {
         kDriveFrictionVoltage = 0.1;
         kSteerCurrentLimit = 40.0; // Example from CTRE documentation
         kDriveCurrentLimit = 120.0; // Example from CTRE documentation
-        // Front Left
+        // Front Left //150/7:1
         kFLDriveMotorId = t.frontLeft().DriveMotorId;
         kFLSteerMotorId = t.frontLeft().SteerMotorId;
         kFLEncoderId = t.frontLeft().EncoderId;
