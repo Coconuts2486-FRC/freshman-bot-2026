@@ -372,7 +372,7 @@ public class RobotContainer {
     // driver controls
 
     // Press X button --> Stop with wheels in X-Lock position
-    driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
+    driverController.rightBumper().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
     // Press Start button --> Manually Re-Zero the Gyro
     driverController
