@@ -5,15 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Zero"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "Left Side Full Disruptant"
+            "pathName": "New Path"
           }
         }
       ]
