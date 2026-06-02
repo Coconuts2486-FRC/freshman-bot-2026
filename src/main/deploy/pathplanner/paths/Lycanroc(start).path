@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.233138373751783,
+        "y": 7.340827389443652
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.233138373751784,
+        "y": 7.340827389443652
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.855962910128387,
+        "y": 6.551569186875891
+      },
+      "prevControl": {
+        "x": 7.7912696148359455,
+        "y": 7.83249643366619
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Lycanroc(start)"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "startpus",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

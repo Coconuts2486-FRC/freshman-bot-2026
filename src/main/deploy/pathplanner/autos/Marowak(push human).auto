@@ -1,0 +1,31 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Zero"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Marowak(start"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Mr.Mime(push)"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

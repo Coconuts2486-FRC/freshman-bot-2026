@@ -13,7 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "left side disruptant"
+            "pathName": "aeRodactyle(start)"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "aeRodactyle(long)"
           }
         }
       ]

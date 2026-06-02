@@ -261,7 +261,7 @@ public final class Constants {
     // Set to TANK for Drive = Left Stick, Turn = Right Stick;
     // Set to GAMER for Drive = Right Stick, Turn = Left Stick;
     // NOTE: Intrepid programmers can turn this into a Dashboard-settable value
-    public static final DriveStyle kDriveStyle = DriveStyle.GAMER; // TANK, GAMER
+    public static final DriveStyle kDriveStyle = DriveStyle.TANK; // TANK, GAMER
 
     // Joystick Deadbands
     public static final double kDeadband = 0.1;
@@ -310,11 +310,11 @@ public final class Constants {
     // For Profiled PID Motion -- NEED TUNING!
     // Used in a variety of contexts, including PathPlanner and AutoPilot
     // Chassis (not module) across-the-field strafing motion
-    public static final double kPStrafe = 8; // 12.5
+    public static final double kPStrafe = 11.5; // 12.5
     public static final double kIStrafe = 0.0;
     public static final double kDStrafe = 0.0;
     // Chassis (not module) solid-body rotation
-    public static final double kPSPin = 8; // 13
+    public static final double kPSPin = 10.5; // 13
     public static final double kISPin = 0.0;
     public static final double kDSpin = 0.0;
 
