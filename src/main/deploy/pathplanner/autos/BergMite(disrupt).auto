@@ -13,13 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Lycanroc(short)"
+            "pathName": "MudBray(short)"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "trench disrupt",
+  "folder": "bump disrupt",
   "choreoAuto": false
 }

@@ -19,13 +19,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Mr.Mime(push)"
+            "pathName": "Marowak(push)"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "trench push",
   "choreoAuto": false
 }
