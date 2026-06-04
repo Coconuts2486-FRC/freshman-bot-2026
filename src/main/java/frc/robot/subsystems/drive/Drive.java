@@ -410,7 +410,6 @@ public class Drive extends RBSISubsystem {
 
   /**
    * Reset the heading for the ProfiledPIDController
-   *
    * <p>Call this when: (A) robot is disabled, (B) gyro is zeroed, (C) autonomous starts
    */
   public void resetHeadingController() {

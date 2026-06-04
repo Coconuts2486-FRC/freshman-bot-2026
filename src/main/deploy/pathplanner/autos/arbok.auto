@@ -1,0 +1,25 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Zero"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Arboc"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "anti autos",
+  "choreoAuto": false
+}
