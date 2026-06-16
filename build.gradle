@@ -181,4 +181,27 @@ task(eventDeploy) {
 createVersionFile.dependsOn(eventDeploy)
 
 // Spotless formatting
+spotless {
+    java {
+        target "src/**/*.java"
+        targetExclude "src/main/java/frc/robot/BuildConstants.java"
+        googleJavaFormat()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
 
+    groovyGradle {
+        target "*.gradle"
+        greclipse()
+        leadingTabsToSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+
+    format "misc", {
+        target "*.md", "doc/**/*.md", ".github/**/*.yml", ".github/**/*.yaml"
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
