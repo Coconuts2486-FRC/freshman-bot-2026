@@ -19,12 +19,12 @@ package frc.robot.util;
  */
 public interface RBSIIO {
 
-  /** Implementations may override to provide PDH ports */
+  /** Implementations may override to provide PDH ports. */
   default int[] powerPorts() {
     return new int[] {};
   }
 
-  /** Common getter */
+  /** Return the list of PDH power ports used for this mechanism. */
   default int[] getPowerPorts() {
     return powerPorts();
   }

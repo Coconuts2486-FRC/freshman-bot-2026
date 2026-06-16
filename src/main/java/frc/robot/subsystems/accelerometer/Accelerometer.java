@@ -16,6 +16,7 @@ package frc.robot.subsystems.accelerometer;
 import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.Constants;
 import frc.robot.Constants.RobotConstants;
+import frc.robot.Constants.SensorConstants;
 import frc.robot.subsystems.imu.Imu;
 import frc.robot.util.TimeUtil;
 import frc.robot.util.VirtualSubsystem;
@@ -37,7 +38,7 @@ public class Accelerometer extends VirtualSubsystem {
 
   // Variables needed during the periodic
   private Translation3d rawRio, rioAcc, rioJerk, imuAcc, imuJerk;
-  private Translation3d prevRioAcc = Translation3d.kZero;
+  private Translation3d prevRioAcc = null;
 
   // Log decimation
   private int loopCount = 0;
@@ -48,20 +49,18 @@ public class Accelerometer extends VirtualSubsystem {
   private static final int PROFILE_EVERY_N = 50; // 1Hz profiling
 
   public Accelerometer(Imu imu) {
-    this.imu = imu;
-    this.rio = new RioAccelIORoboRIO(200.0); // 200 Hz is a good start
+    this(imu, new RioAccelIORoboRIO(SensorConstants.kRioAccelerometerSampleRateHz));
   }
 
-  /**
-   * Priority value for this virtual subsystem
-   *
-   * <p>See `frc.robot.util.VirtualSubsystem` for a description of the suggested values for various
-   * virtual subsystems.
-   */
+  public Accelerometer(Imu imu, RioAccelIO rio) {
+    this.imu = imu;
+    this.rio = rio;
+  }
+
+  // Priority value for this virtual subsystem
   @Override
   protected int getPeriodPriority() {
-    // Low-priority status system
-    return 10;
+    return +10;
   }
 
   @Override
@@ -76,12 +75,15 @@ public class Accelerometer extends VirtualSubsystem {
     // Compute RIO accelerations and jerks
     rawRio =
         new Translation3d(
-            rioInputs.xG * Constants.G_TO_MPS2,
-            rioInputs.yG * Constants.G_TO_MPS2,
-            rioInputs.zG * Constants.G_TO_MPS2);
+            rioInputs.xG * Constants.kGravityMetersPerSecSq,
+            rioInputs.yG * Constants.kGravityMetersPerSecSq,
+            rioInputs.zG * Constants.kGravityMetersPerSecSq);
     rioAcc = rawRio.rotateBy(RobotConstants.kRioOrientation);
 
-    // Acceleration from previous loop
+    Translation3d rioJerkThisLoop =
+        prevRioAcc == null
+            ? Translation3d.kZero
+            : rioAcc.minus(prevRioAcc).div(Constants.kLoopPeriodSecs);
     prevRioAcc = rioAcc;
 
     // IMU accelerations and jerks
@@ -95,10 +97,10 @@ public class Accelerometer extends VirtualSubsystem {
     final boolean doHeavyLogs = (++loopCount >= LOG_EVERY_N);
     if (doHeavyLogs) {
       loopCount = 0;
-      rioJerk = rioAcc.minus(prevRioAcc).div(Constants.loopPeriodSecs);
+      rioJerk = rioJerkThisLoop;
       imuJerk = imuInputs.linearJerk.rotateBy(RobotConstants.kIMUOrientation);
-      // Logger.recordOutput("Accel/Rio/Jerk_mps3", rioJerk);
-      // Logger.recordOutput("Accel/IMU/Jerk_mps3", imuJerk);
+      Logger.recordOutput("Accel/Rio/Jerk_mps3", rioJerk);
+      Logger.recordOutput("Accel/IMU/Jerk_mps3", imuJerk);
 
       final double[] ts = imuInputs.odometryYawTimestamps;
       if (ts.length > 0) {

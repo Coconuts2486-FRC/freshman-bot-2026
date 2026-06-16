@@ -6,38 +6,38 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 
-public final class PinchyTunerView implements TunerView {
+public final class DEVBOT1TunerView implements TunerView {
   @Override
   public CANBus canBus() {
-    return PinchyTunerConstants.kCANBus;
+    return DEVBOT1TunerConstants.kCANBus;
   }
 
   @Override
   public SwerveDrivetrainConstants drivetrain() {
-    return PinchyTunerConstants.DrivetrainConstants;
+    return DEVBOT1TunerConstants.DrivetrainConstants;
   }
 
   @Override
   public SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
       frontLeft() {
-    return PinchyTunerConstants.FrontLeft;
+    return DEVBOT1TunerConstants.FrontLeft;
   }
 
   @Override
   public SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
       frontRight() {
-    return PinchyTunerConstants.FrontRight;
+    return DEVBOT1TunerConstants.FrontRight;
   }
 
   @Override
   public SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
       backLeft() {
-    return PinchyTunerConstants.BackLeft;
+    return DEVBOT1TunerConstants.BackLeft;
   }
 
   @Override
   public SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
       backRight() {
-    return PinchyTunerConstants.BackRight;
+    return DEVBOT1TunerConstants.BackRight;
   }
 }

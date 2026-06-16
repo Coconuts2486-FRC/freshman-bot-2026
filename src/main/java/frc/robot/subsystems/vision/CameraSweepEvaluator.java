@@ -146,7 +146,7 @@ public class CameraSweepEvaluator {
     // Sweep robot yaw at each location (degrees)
     double[] robotYawDeg = {-180, -135, -90, -45, 0, 45, 90, 135};
 
-    // Camera "extra" rotation sweep (applied on top of the mount rotation)
+    // Camera “extra” rotation sweep (applied on top of the mount rotation)
     double[] camYawDeg = {-15, 0, 15};
     double[] camPitchDeg = {-10, 0, 10};
 
@@ -242,7 +242,7 @@ public class CameraSweepEvaluator {
                               c1Q.getY(),
                               c1Q.getZ()));
 
-                      // Optional logging: keep it light (or decimate) so it doesn't dominate
+                      // Optional logging: keep it light (or decimate) so it doesn’t dominate
                       // runtime
                       Logger.recordOutput("CameraSweep/Score", score);
                     }

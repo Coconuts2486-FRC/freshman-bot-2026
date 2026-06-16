@@ -13,9 +13,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ModuleIO {
+  double[] EMPTY_DOUBLE_ARRAY = new double[0];
+  Rotation2d[] EMPTY_ROTATION_ARRAY = new Rotation2d[0];
+
   @AutoLog
   public static class ModuleIOInputs {
-
     public boolean driveConnected = false;
     public double drivePositionRad = 0.0;
     public double driveVelocityRadPerSec = 0.0;
@@ -30,9 +32,9 @@ public interface ModuleIO {
     public double turnAppliedVolts = 0.0;
     public double turnCurrentAmps = 0.0;
 
-    public double[] odometryTimestamps = new double[] {};
-    public double[] odometryDrivePositionsRad = new double[] {};
-    public Rotation2d[] odometryTurnPositions = new Rotation2d[] {};
+    public double[] odometryTimestamps = EMPTY_DOUBLE_ARRAY;
+    public double[] odometryDrivePositionsRad = EMPTY_DOUBLE_ARRAY;
+    public Rotation2d[] odometryTurnPositions = EMPTY_ROTATION_ARRAY;
   }
 
   /** Updates the set of loggable inputs. */
