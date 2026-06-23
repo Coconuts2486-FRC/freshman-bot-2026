@@ -45,9 +45,14 @@ import frc.robot.subsystems.accelerometer.RioAccelIO;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveOdometry;
 import frc.robot.subsystems.drive.SwerveConstants;
+import frc.robot.subsystems.extender.Extender;
+import frc.robot.subsystems.extender.ExtenderIO;
+import frc.robot.subsystems.extender.ExtenderIOSim;
+import frc.robot.subsystems.extender.ExtenderIOTalonFX;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
+import frc.robot.subsystems.flywheel_example.FlywheelIOTalonFX;
 import frc.robot.subsystems.imu.Imu;
 import frc.robot.subsystems.imu.ImuIO;
 import frc.robot.subsystems.imu.ImuIOSim;
@@ -95,6 +100,7 @@ public class RobotContainer {
   // These are the "Active Subsystems" that the robot controls
   private final Drive m_drivebase;
 
+  private final Extender m_extender;
   private final Flywheel m_flywheel;
 
   // ... Add additional subsystems here (e.g., elevator, arm, etc.)
@@ -158,7 +164,10 @@ public class RobotContainer {
         m_vision =
             new Vision(
                 m_drivebase, m_drivebase::addVisionMeasurement, buildVisionIOsReal(m_drivebase));
-        m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
+        m_extender =
+            new Extender(new ExtenderIOTalonFX()); // new Flywheel(new FlywheelIOTalonFX());
+        m_flywheel =
+            new Flywheel(new FlywheelIOTalonFX()); // new Flywheel(new FlywheelIOTalonFX());
         m_accel = new Accelerometer(m_imu);
         sweep = null;
         break;
@@ -172,6 +181,7 @@ public class RobotContainer {
         m_vision =
             new Vision(
                 m_drivebase, m_drivebase::addVisionMeasurement, buildVisionIOsSim(m_drivebase));
+        m_extender = new Extender(new ExtenderIOSim());
         m_flywheel = new Flywheel(new FlywheelIOSim());
         m_accel = new Accelerometer(m_imu);
 
@@ -206,6 +216,7 @@ public class RobotContainer {
             new Vision(
                 m_drivebase, m_drivebase::addVisionMeasurement, buildVisionIOsReplay(m_drivebase));
 
+        m_extender = new Extender(new ExtenderIO() {});
         m_flywheel = new Flywheel(new FlywheelIO() {});
         m_accel = new Accelerometer(m_imu, RioAccelIO.noop());
         sweep = null;
@@ -218,7 +229,7 @@ public class RobotContainer {
     // In addition to the initial battery capacity from the Dashbaord, ``RBSIPowerMonitor`` takes
     // all the non-drivebase subsystems for which you wish to have power monitoring; DO NOT
     // include ``m_drivebase``, as that is automatically monitored.
-    m_power = new RBSIPowerMonitor(batteryCapacity, m_flywheel);
+    m_power = new RBSIPowerMonitor(batteryCapacity, m_extender);
 
     // Define PathPlanner named commands before any autos or paths are created.
     defineAutoCommands();

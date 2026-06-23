@@ -1,6 +1,5 @@
 package frc.robot.subsystems.extender;
 
-import edu.wpi.first.units.measure.Velocity;
 import frc.robot.util.RBSISubsystem;
 
 public class Extender extends RBSISubsystem {
@@ -15,18 +14,18 @@ public class Extender extends RBSISubsystem {
   protected void rbsiPeriodic() {
     io.updateInputs(inputs);
   }
-  
+
   public void configPID(double kP, double kI, double kD) {
     io.configPID(kP, kI, kD);
   }
 
-  public void setPivotVelocity(double veloccityInput){
+  public void setPivotVelocity(double veloccityInput) {
     io.setPivotVelocity(veloccityInput);
   }
 
-  public void stopPivot(){
+  public void stopPivot() {
     io.setPivotVelocity(0);
-  }  
+  }
 
   public double downPos() {
     return 0.0;
