@@ -22,13 +22,34 @@ public class ExtenderIOTalonFX implements ExtenderIO {
   private final StatusSignal<Voltage> extenderAppliedVolts = null;
   private final StatusSignal<Current> extenderCurrent = null;
 
-  @Override
-  public void stop() {
-    extenderMotor.stopMotor();
-  }
+//   private final PIDController pid = new PIDController(0,0,0);
 
-  @Override
-  public void updateInputs(ExtenderIOInputs inputs) {
+//   @Override
+//   public void stop() {
+//     extenderMotor.stop(0);
+//   }
+
+// @Override
+//   public void setPivotVelocity(double velocity);
+//   extenderMotor.set(velocity);
+// }
+// @Override
+//   public void goUntilPosition(double position){
+//   Pivot.set(pid.calculate(extenderEncoder.get(),position));
+// }
+
+// @Override
+//   public double downPos() {
+//   return
+// }
+
+// @Override 
+//   public void configPID(double kP, double kI, double kD) {
+
+//   config.closedloop.p(kP).i(kI).d(kD);
+// }
+//   @Override
+//   public void updateInputs(ExtenderIOInputs inputs) {
 
     var extenderStatus =
         BaseStatusSignal.refreshAll(
