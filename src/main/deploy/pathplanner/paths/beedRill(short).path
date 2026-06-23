@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.7285306704707555,
-        "y": 2.5794008559201154
+        "x": 3.6120827389443653,
+        "y": 2.4758915834522113
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.728530670470758,
-        "y": 2.5794008559201154
+        "x": 4.612082738944369,
+        "y": 2.4758915834522113
       },
       "isLocked": false,
       "linkedName": null
@@ -61,10 +61,10 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "bumps",
+  "folder": "bump distrup",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 87.6140559696111
   },
   "useDefaultConstraints": true
 }

@@ -18,10 +18,16 @@ public interface ExtenderIO extends RBSIIO {
   public default double getPos() {
     return 0.0;
   }
+  public default void setPivotVelocity(double velocityInput){}
 
-  public default void goToPos(double Pos) {}
+  public default void stop(){}
+  
+  public default void configPID(double kP, double kI, double kD){}
 
-  public default void setVelocity(double velocity) {}
+  public default double downPos(){
+    return 0.0;
+  }
 
-  public default void stop() {}
+  public default void goUntilPosition (double position){}
+  
 }

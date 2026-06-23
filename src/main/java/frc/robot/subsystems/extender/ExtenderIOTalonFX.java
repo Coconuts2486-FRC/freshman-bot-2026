@@ -6,6 +6,8 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -17,42 +19,35 @@ public class ExtenderIOTalonFX implements ExtenderIO {
   private final CANcoder extenderEncoder =
       new CANcoder(EXTENDER_ENCODER.getDeviceNumber(), EXTENDER_ENCODER.getCANBus());
 
+
+      
   private final StatusSignal<Angle> extenderPosition = null;
   private final StatusSignal<AngularVelocity> extenderVelocity = null;
   private final StatusSignal<Voltage> extenderAppliedVolts = null;
   private final StatusSignal<Current> extenderCurrent = null;
+  
+  private final PIDController pid = new PIDController(0,0,0);
 
-//   private final PIDController pid = new PIDController(0,0,0);
-
-//   @Override
-//   public void stop() {
-//     extenderMotor.stop(0);
-//   }
-
-// @Override
-//   public void setPivotVelocity(double velocity);
-//   extenderMotor.set(velocity);
-// }
-// @Override
-//   public void goUntilPosition(double position){
-//   Pivot.set(pid.calculate(extenderEncoder.get(),position));
-// }
-
-// @Override
-//   public double downPos() {
-//   return
-// }
-
-// @Override 
-//   public void configPID(double kP, double kI, double kD) {
-
-//   config.closedloop.p(kP).i(kI).d(kD);
-// }
-//   @Override
-//   public void updateInputs(ExtenderIOInputs inputs) {
-
-    var extenderStatus =
-        BaseStatusSignal.refreshAll(
-            extenderPosition, extenderVelocity, extenderAppliedVolts, extenderCurrent);
+  @Override
+  public void stop() {
+    extenderMotor.stopMotor();
   }
+
+@Override
+  public void setPivotVelocity(double velocity){
+  extenderMotor.set(velocity);
+  }
+@Override
+  public void goUntilPosition(double position){
+  extenderMotor.set(pid.calculate(extenderEncoder.getAbsolutePosition().getValueAsDouble(),position));
+  }
+
+@Override
+  public double downPos() {
+  return 0.0;
+  } 
+
+@Override 
+  public void configPID(double kP, double kI, double kD) {}
+
 }

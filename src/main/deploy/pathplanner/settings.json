@@ -3,18 +3,17 @@
   "robotLength": 0.826,
   "holonomicMode": true,
   "pathFolders": [
-    "anti paths",
-    "bumps",
-    "push",
-    "short",
-    "startpus"
-  ],
-  "autoFolders": [
-    "anti autos",
-    "bump disrupt",
+    "trench push start",
+    "bump distrup",
     "bump push",
     "trench disrupt",
     "trench push"
+  ],
+  "autoFolders": [
+    "trench push",
+    "bump disrupt",
+    "bump push",
+    "trench disrupt"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,

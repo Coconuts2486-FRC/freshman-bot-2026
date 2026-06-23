@@ -15,21 +15,21 @@ public class Extender extends RBSISubsystem {
   protected void rbsiPeriodic() {
     io.updateInputs(inputs);
   }
-
-  public double extenderPos() {
-    return io.getPos();
+  
+  public void configPID(double kP, double kI, double kD) {
+    io.configPID(kP, kI, kD);
   }
 
-  public void goToPos(double Pos) {
-    io.goToPos(Pos);
+  public void setPivotVelocity(double veloccityInput){
+    io.setPivotVelocity(veloccityInput);
   }
 
-  public void setVelocity(double Velocity) {
-    io.setVelocity(Velocity);
-  }
+  public void stopPivot(){
+    io.setPivotVelocity(0);
+  }  
 
-  public void stop() {
-    io.stop();
+  public double downPos() {
+    return 0.0;
   }
 
   public boolean isExtenderAlive() {

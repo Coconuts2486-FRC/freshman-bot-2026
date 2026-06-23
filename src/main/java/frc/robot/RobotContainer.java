@@ -56,7 +56,7 @@ import frc.robot.subsystems.driver_info.CANStatus;
 import frc.robot.subsystems.driver_info.MatchStatus;
 import frc.robot.subsystems.extender.Extender;
 import frc.robot.subsystems.extender.ExtenderIO;
-import frc.robot.subsystems.extender.ExtenderIOServo;
+import frc.robot.subsystems.extender.ExtenderIOTalonFX;
 import frc.robot.subsystems.imu.Imu;
 import frc.robot.subsystems.imu.ImuIOSim;
 import frc.robot.subsystems.vision.CameraSweepEvaluator;
@@ -188,7 +188,7 @@ public class RobotContainer {
 
         m_matchstatus = new MatchStatus(driverController, operatorController, blinkin);
 
-        m_extender = new Extender(new ExtenderIOServo());
+        m_extender = new Extender(new ExtenderIOTalonFX());
         sweep = null;
 
         break;
