@@ -88,9 +88,9 @@ public class ImuIONavX implements ImuIO {
     // World linear accel (NavX returns "g" typically); convert to m/s/s
     inputs.linearAccel =
         new Translation3d(
-            navx.getWorldLinearAccelX() * Constants.G_TO_MPS2,
-            navx.getWorldLinearAccelY() * Constants.G_TO_MPS2,
-            navx.getWorldLinearAccelZ() * Constants.G_TO_MPS2);
+            navx.getWorldLinearAccelX() * Constants.kGravityMetersPerSecSq,
+            navx.getWorldLinearAccelY() * Constants.kGravityMetersPerSecSq,
+            navx.getWorldLinearAccelZ() * Constants.kGravityMetersPerSecSq);
 
     // Jerk computed as (delta accel) / dt
     if (prevTimestampNs != 0L) {
@@ -116,8 +116,8 @@ public class ImuIONavX implements ImuIO {
       inputs.odometryYawPositionsRad = yawOut;
     } else {
       // ...otherwise return empty arrays
-      inputs.odometryYawTimestamps = new double[] {};
-      inputs.odometryYawPositionsRad = new double[] {};
+      inputs.odometryYawTimestamps = EMPTY_DOUBLE_ARRAY;
+      inputs.odometryYawPositionsRad = EMPTY_DOUBLE_ARRAY;
     }
 
     // Compute how long this took in seconds
@@ -187,31 +187,5 @@ public class ImuIONavX implements ImuIO {
     while (newCap < n) newCap *= 2;
     odomTsBuf = new double[newCap];
     odomYawRadBuf = new double[newCap];
-  }
-
-  // /**
-  //  * Zero the NavX
-  //  *
-  //  * <p>This method should always rezero the pigeon in ALWAYS-BLUE-ORIGIN orientation. Testing,
-  //  * however, shows that it's not doing what I think it should be doing. There is likely
-  //  * interference with something else in the odometry
-  //  */
-  // @Override
-  // public void zero() {
-  //   // With the Pigeon facing forward, forward depends on the alliance selected.
-  //   // Set Angle Adjustment based on alliance
-  //   if (DriverStation.getAlliance().get() == Alliance.Blue) {
-  //     navx.setAngleAdjustment(0.0);
-  //   } else {
-  //     navx.setAngleAdjustment(180.0);
-  //   }
-  //   System.out.println("Setting YAW to " + navx.getAngleAdjustment());
-  //   navx.zeroYaw();
-  // }
-
-  /** Dummy function to make things happy -- doesn't actually do anything */
-  @Override
-  public int[] powerPorts() {
-    return new int[] {};
   }
 }

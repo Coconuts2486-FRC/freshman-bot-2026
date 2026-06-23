@@ -7,10 +7,10 @@
 // license that can be found in the AdvantageKit-License.md file
 // at the root directory of this project.
 
-package frc.robot.subsystems.shooter;
+package frc.robot.subsystems.flywheel_example;
 
+import static frc.robot.Constants.FlywheelConstants.*;
 import static frc.robot.Constants.RobotDevices.*;
-import static frc.robot.Constants.ShooterConstants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -20,6 +20,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -31,72 +32,70 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants;
 import frc.robot.Constants.PowerConstants;
-import frc.robot.Constants.ShooterConstants;
 import frc.robot.util.PhoenixUtil;
 import frc.robot.util.RBSIEnum.CTREPro;
 
-public class ShooterIOTalonFX implements ShooterIO {
+public class FlywheelIOTalonFX implements FlywheelIO {
 
   // Define the leader / follower motors from the Ports section of RobotContainer
   private final TalonFX leader =
-      new TalonFX(SHOOTER_LEADER.getDeviceNumber(), SHOOTER_LEADER.getCANBus());
+      new TalonFX(FLYWHEEL_LEADER.getDeviceNumber(), FLYWHEEL_LEADER.getCANBus());
   private final TalonFX follower =
-      new TalonFX(SHOOTER_FOLLOWER.getDeviceNumber(), SHOOTER_FOLLOWER.getCANBus());
-
-  public final int[] POWER_PORTS = {SHOOTER_LEADER.getPowerPort(), SHOOTER_FOLLOWER.getPowerPort()};
+      new TalonFX(FLYWHEEL_FOLLOWER.getDeviceNumber(), FLYWHEEL_FOLLOWER.getCANBus());
   // IMPORTANT: Include here all devices listed above that are part of this mechanism!
+  public final int[] powerPorts = {
+    FLYWHEEL_LEADER.getPowerPort(), FLYWHEEL_FOLLOWER.getPowerPort()
+  };
+
+  @Override
+  public int[] powerPorts() {
+    return powerPorts;
+  }
 
   private final StatusSignal<Angle> leaderPosition = leader.getPosition();
   private final StatusSignal<AngularVelocity> leaderVelocity = leader.getVelocity();
   private final StatusSignal<Voltage> leaderAppliedVolts = leader.getMotorVoltage();
-
-  private final StatusSignal<Angle> followerPosition = follower.getPosition();
-  private final StatusSignal<AngularVelocity> followerVelocity = follower.getVelocity();
-  private final StatusSignal<Voltage> followerAppliedVolts = follower.getMotorVoltage();
-
   private final StatusSignal<Current> leaderCurrent = leader.getSupplyCurrent();
   private final StatusSignal<Current> followerCurrent = follower.getSupplyCurrent();
 
   private final TalonFXConfiguration config = new TalonFXConfiguration();
   private final boolean isCTREPro = Constants.getPhoenixPro() == CTREPro.LICENSED;
+  private final VoltageOut voltageRequest = new VoltageOut(0);
+  private final DutyCycleOut dutyCycleRequest = new DutyCycleOut(0);
+  private final VelocityVoltage velocityVoltageRequest = new VelocityVoltage(0);
+  private final MotionMagicVelocityVoltage motionMagicVelocityRequest =
+      new MotionMagicVelocityVoltage(0);
 
-  /** Return the power ports */
-  @Override
-  public int[] powerPorts() {
-    return POWER_PORTS;
-  }
-
-  /** Constructor */
-  public ShooterIOTalonFX() {
-    config.CurrentLimits.SupplyCurrentLimit = PowerConstants.kMotorPortMaxCurrent;
+  public FlywheelIOTalonFX() {
+    config.CurrentLimits.SupplyCurrentLimit = PowerConstants.kMotorPortMaxCurrentAmps;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode =
-        switch (kShooterIdleMode) {
+        switch (kIdleMode) {
           case COAST -> NeutralModeValue.Coast;
           case BRAKE -> NeutralModeValue.Brake;
         };
     // Build the OpenLoopRampsConfigs and ClosedLoopRampsConfigs for current smoothing
     OpenLoopRampsConfigs openRamps = new OpenLoopRampsConfigs();
-    openRamps.DutyCycleOpenLoopRampPeriod = kShooterOpenLoopRampPeriod;
-    openRamps.VoltageOpenLoopRampPeriod = kShooterOpenLoopRampPeriod;
-    openRamps.TorqueOpenLoopRampPeriod = kShooterOpenLoopRampPeriod;
+    openRamps.DutyCycleOpenLoopRampPeriod = kOpenLoopRampPeriodSecs;
+    openRamps.VoltageOpenLoopRampPeriod = kOpenLoopRampPeriodSecs;
+    openRamps.TorqueOpenLoopRampPeriod = kOpenLoopRampPeriodSecs;
     ClosedLoopRampsConfigs closedRamps = new ClosedLoopRampsConfigs();
-    closedRamps.DutyCycleClosedLoopRampPeriod = kShooterClosedLoopRampPeriod;
-    closedRamps.VoltageClosedLoopRampPeriod = kShooterClosedLoopRampPeriod;
-    closedRamps.TorqueClosedLoopRampPeriod = kShooterClosedLoopRampPeriod;
+    closedRamps.DutyCycleClosedLoopRampPeriod = kClosedLoopRampPeriodSecs;
+    closedRamps.VoltageClosedLoopRampPeriod = kClosedLoopRampPeriodSecs;
+    closedRamps.TorqueClosedLoopRampPeriod = kClosedLoopRampPeriodSecs;
     // Apply the open- and closed-loop ramp configuration for current smoothing
     config.withClosedLoopRamps(closedRamps).withOpenLoopRamps(openRamps);
     // set Motion Magic Velocity settings
     var motionMagicConfigs = config.MotionMagic;
     motionMagicConfigs.MotionMagicAcceleration =
-        400; // Target acceleration of 400 rps/s (0.25 seconds to max)
-    motionMagicConfigs.MotionMagicJerk = 4000; // Target jerk of 4000 rps/s/s (0.1 seconds)
+        kMotionMagicAccelerationRotPerSecSq; // Target acceleration in rotations/s/s
+    motionMagicConfigs.MotionMagicJerk = kMotionMagicJerkRotPerSecCubed; // rotations/s/s/s
 
-    // Apply the configurations to the Shooter motors
+    // Apply the configurations to the flywheel motors
     PhoenixUtil.tryUntilOk(5, () -> leader.getConfigurator().apply(config, 0.25));
     PhoenixUtil.tryUntilOk(5, () -> follower.getConfigurator().apply(config, 0.25));
     // If follower rotates in the opposite direction, set "MotorAlignmentValue" to Opposed
-    follower.setControl(new Follower(leader.getDeviceID(), MotorAlignmentValue.Opposed));
+    follower.setControl(new Follower(leader.getDeviceID(), MotorAlignmentValue.Aligned));
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0, leaderPosition, leaderVelocity, leaderAppliedVolts, leaderCurrent, followerCurrent);
@@ -105,106 +104,46 @@ public class ShooterIOTalonFX implements ShooterIO {
   }
 
   @Override
-  public void updateInputs(ShooterIOInputs inputs) {
-
-    var followerStatus =
-        BaseStatusSignal.refreshAll(
-            followerPosition, followerVelocity, followerAppliedVolts, followerCurrent);
-
-    var leaderStatus =
-        BaseStatusSignal.refreshAll(
-            leaderPosition, leaderVelocity, leaderAppliedVolts, leaderCurrent);
-
-    inputs.leaderAlive = leaderStatus.isOK();
-    inputs.followerAlive = followerStatus.isOK();
-
-    // TODO: Decide whether we're using MOTOR angular speed or FLYWHEEL angular speed!!!
-    inputs.positionRad = Units.rotationsToRadians(leaderPosition.getValueAsDouble());
-    inputs.velocityRadPerSec = Units.rotationsToRadians(leaderVelocity.getValueAsDouble());
-    inputs.velocityMetersPerSec =
-        Math.abs(
-            inputs.velocityRadPerSec / kShooterGearRatio * ShooterConstants.kFlywheelCircumfrence);
+  public void updateInputs(FlywheelIOInputs inputs) {
+    BaseStatusSignal.refreshAll(
+        leaderPosition, leaderVelocity, leaderAppliedVolts, leaderCurrent, followerCurrent);
+    inputs.positionRad = Units.rotationsToRadians(leaderPosition.getValueAsDouble()) / kGearRatio;
+    inputs.velocityRadPerSec =
+        Units.rotationsToRadians(leaderVelocity.getValueAsDouble()) / kGearRatio;
     inputs.appliedVolts = leaderAppliedVolts.getValueAsDouble();
-
-    inputs.positionRadFollower = Units.rotationsToRadians(followerPosition.getValueAsDouble());
-    inputs.velocityRadPerSecFollower =
-        Units.rotationsToRadians(followerVelocity.getValueAsDouble());
-    inputs.velocityMetersPerSecFollower =
-        Math.abs(
-            inputs.velocityRadPerSecFollower
-                / kShooterGearRatio
-                * ShooterConstants.kFlywheelCircumfrence);
-    inputs.appliedVoltsFollower = followerAppliedVolts.getValueAsDouble();
-
     inputs.currentAmps =
         new double[] {leaderCurrent.getValueAsDouble(), followerCurrent.getValueAsDouble()};
   }
 
   @Override
   public void setVoltage(double volts) {
-    leader.setControl(new VoltageOut(volts).withEnableFOC(isCTREPro));
+    leader.setControl(voltageRequest.withOutput(volts).withEnableFOC(isCTREPro));
   }
 
   @Override
-  /**
-   * Set the velocity of the motor in rotations per second
-   *
-   * @param velocityRotationsPerSecond Desired angular speed in rotations per second
-   */
-  public void setVelocity(double velocityRotationsPerSecond) {
-    // create a Motion Magic Velocity request, voltage output
-    final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(0);
-    // final VelocityVoltage m_request = new VelocityVoltage(0);
-    m_request.withEnableFOC(isCTREPro);
-    leader.setControl(m_request.withVelocity(velocityRotationsPerSecond));
+  public void setVelocity(double velocityRadPerSec) {
+    leader.setControl(
+        velocityVoltageRequest
+            .withVelocity(Units.radiansToRotations(velocityRadPerSec) * kGearRatio)
+            .withEnableFOC(isCTREPro));
   }
 
-  /**
-   * Primitive set speed in percent
-   *
-   * <p>Only use this function for testing!!!
-   *
-   * @param speed Primitive -1.0 to 1.0 value
-   */
   @Override
-  public void set(double speed) {
-    leader.set(speed);
+  public void setVelocityProfiled(double velocityRadPerSec) {
+    leader.setControl(
+        motionMagicVelocityRequest
+            .withVelocity(Units.radiansToRotations(velocityRadPerSec) * kGearRatio)
+            .withEnableFOC(isCTREPro));
   }
 
   @Override
   public void setPercent(double percent) {
-    leader.setControl(new DutyCycleOut(percent).withEnableFOC(isCTREPro));
+    leader.setControl(dutyCycleRequest.withOutput(percent).withEnableFOC(isCTREPro));
   }
 
   @Override
   public void stop() {
     leader.stopMotor();
-  }
-
-  /** Getter Functions ===================================================== */
-  @Override
-  public double get() {
-    return leader.get();
-  }
-
-  @Override
-  public double getVelocityRPM() {
-    return leader.getVelocity().getValueAsDouble() * 60.;
-  }
-
-  @Override
-  public Angle getPositionRot() {
-    return leader.getPosition().getValue();
-  }
-
-  @Override
-  public AngularVelocity getVelocityRotPerSec() {
-    return leader.getVelocity().getValue();
-  }
-
-  @Override
-  public Voltage getMotorVoltage() {
-    return leader.getMotorVoltage().getValue();
   }
 
   /**

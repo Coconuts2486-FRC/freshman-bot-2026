@@ -12,10 +12,10 @@ public final class TunerFactory {
 
     // Return the proper view into TunerConstants
     return switch (Constants.getRobot()) {
-      case PINCHY -> new PinchyTunerView();
-      case GEORGE -> new GeorgeTunerView();
-      case COMPBOT -> new CompbotTunerView();
-      default -> new CompbotTunerView();
+      case DEVBOT2 -> new DEVBOT2TunerView();
+      case DEVBOT1 -> new DEVBOT1TunerView();
+      case COMPBOT -> new COMPBOTTunerView();
+      default -> new COMPBOTTunerView();
     };
   }
 }

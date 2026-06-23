@@ -51,12 +51,6 @@ public class FieldState {
    *
    * @return Whether the team's alliance's HUB is active right now
    */
-  public static Alliance stationAlliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-
-  public static Alliance getAlliance() {
-    return stationAlliance;
-  }
-
   public static boolean isHubActive() {
 
     // The HUB is active for both alliances in AUTO
@@ -69,14 +63,9 @@ public class FieldState {
       return false;
     }
 
-    // Read in the current match time & get alliance
-    // TODO: Since the ``DriverStation.getMatchTime()`` returns INT::
-    //       Return the approximate match time. The FMS does not send an
-    //       official match time to the robots, but does send an approximate
-    //       match time. The value will count down the time remaining in the
-    //       current period (auto or teleop). Warning: This is not an official
-    //       time (so it cannot be used to dispute ref calls or guarantee that
-    //       a function will trigger before the match ends).
+    // Read the approximate match time and alliance. The FMS does not send an official match time to
+    // robots; DriverStation.getMatchTime() is approximate and should not be used to dispute ref
+    // calls or guarantee that a function will trigger before the match ends.
     double timeRemaining = DriverStation.getMatchTime();
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
 
