@@ -8,12 +8,12 @@
 
 package frc.robot.util;
 
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
-import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.junction.Logger;
+import org.wpilib.command2.button.CommandNiDsPS4Controller;
+import org.wpilib.command2.button.CommandNiDsPS5Controller;
+import org.wpilib.command2.button.CommandNiDsXboxController;
+import org.wpilib.command2.button.Trigger;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 
 /**
  * Semantic wrapper for the driver controller.
@@ -41,7 +41,7 @@ public abstract class RBSIController {
 
   /** Creates a controller wrapper for the HID currently connected at startup. */
   public static RBSIController createDriverController(int port) {
-    String name = DriverStation.getJoystickName(port);
+    String name = DriverStationBackend.getJoystickName(port);
     RBSIController controller = createController(port, name);
 
     Logger.recordOutput("DriverController/Port", port);
@@ -51,24 +51,24 @@ public abstract class RBSIController {
   }
 
   private static RBSIController createController(int port, String name) {
-    if (DriverStation.getJoystickIsXbox(port)) {
-      return new XboxDriverController(port);
+    if (DriverStationBackend.getJoystickIsGamepad(port)) {
+      return new XboxControllerAdapter(port);
     }
 
     String normalizedName = name == null ? "" : name.toLowerCase();
     if (normalizedName.contains(DUALSENSE_NAME_MARKER)
         || normalizedName.contains(PS5_NAME_MARKER)
         || normalizedName.contains(WIRELESS_CONTROLLER_NAME)) {
-      return new PS5DriverController(port);
+      return new PS5ControllerAdapter(port);
     }
     if (normalizedName.contains(DUALSHOCK_NAME_MARKER)
         || normalizedName.contains(PS4_NAME_MARKER)
         || normalizedName.contains(PLAYSTATION_NAME_MARKER)
         || normalizedName.contains(PS_NAME_MARKER)) {
-      return new PS4DriverController(port);
+      return new PS4ControllerAdapter(port);
     }
 
-    return new XboxDriverController(port);
+    return new XboxControllerAdapter(port);
   }
 
   public int getPort() {
@@ -79,25 +79,47 @@ public abstract class RBSIController {
     return controllerType;
   }
 
-  public abstract Trigger robotRelative();
+  public Trigger robotRelative() {
+    return button(Button.EAST_FACE);
+  }
 
-  public abstract Trigger brake();
+  public Trigger brake() {
+    return button(Button.SOUTH_FACE);
+  }
 
-  public abstract Trigger xLock();
+  public Trigger xLock() {
+    return button(Button.WEST_FACE);
+  }
 
-  public abstract Trigger zeroGyro();
+  public Trigger zeroGyro() {
+    return button(Button.NORTH_FACE);
+  }
 
-  public abstract Trigger runFlywheel();
+  public Trigger runFlywheel() {
+    return button(Button.RIGHT_BUMPER);
+  }
 
-  public abstract Trigger autopilotDemo();
+  public Trigger autopilotDemo() {
+    return button(Button.LEFT_BUMPER);
+  }
 
-  public abstract Trigger povLeft();
+  public Trigger povLeft() {
+    return button(Button.POV_LEFT);
+  }
 
-  public abstract Trigger povRight();
+  public Trigger povRight() {
+    return button(Button.POV_RIGHT);
+  }
 
-  public abstract Trigger povUp();
+  public Trigger povUp() {
+    return button(Button.POV_UP);
+  }
 
-  public abstract Trigger povDown();
+  public Trigger povDown() {
+    return button(Button.POV_DOWN);
+  }
+
+  protected abstract Trigger button(Button button);
 
   public abstract double getLeftX();
 
@@ -107,62 +129,45 @@ public abstract class RBSIController {
 
   public abstract double getRightY();
 
-  private static final class XboxDriverController extends RBSIController {
-    private final CommandXboxController controller;
+  private enum Button {
+    SOUTH_FACE,
+    EAST_FACE,
+    WEST_FACE,
+    NORTH_FACE,
+    LEFT_BUMPER,
+    RIGHT_BUMPER,
+    LEFT_STICK,
+    RIGHT_STICK,
+    POV_LEFT,
+    POV_RIGHT,
+    POV_UP,
+    POV_DOWN
+  }
 
-    private XboxDriverController(int port) {
+  private static final class XboxControllerAdapter extends RBSIController {
+    private final CommandNiDsXboxController controller;
+
+    private XboxControllerAdapter(int port) {
       super(port, "Xbox");
-      controller = new CommandXboxController(port);
+      controller = new CommandNiDsXboxController(port);
     }
 
     @Override
-    public Trigger robotRelative() {
-      return controller.b();
-    }
-
-    @Override
-    public Trigger brake() {
-      return controller.a();
-    }
-
-    @Override
-    public Trigger xLock() {
-      return controller.x();
-    }
-
-    @Override
-    public Trigger zeroGyro() {
-      return controller.y();
-    }
-
-    @Override
-    public Trigger runFlywheel() {
-      return controller.rightBumper();
-    }
-
-    @Override
-    public Trigger autopilotDemo() {
-      return controller.leftBumper();
-    }
-
-    @Override
-    public Trigger povLeft() {
-      return controller.povLeft();
-    }
-
-    @Override
-    public Trigger povRight() {
-      return controller.povRight();
-    }
-
-    @Override
-    public Trigger povUp() {
-      return controller.povUp();
-    }
-
-    @Override
-    public Trigger povDown() {
-      return controller.povDown();
+    protected Trigger button(Button button) {
+      return switch (button) {
+        case SOUTH_FACE -> controller.a();
+        case EAST_FACE -> controller.b();
+        case WEST_FACE -> controller.x();
+        case NORTH_FACE -> controller.y();
+        case LEFT_BUMPER -> controller.leftBumper();
+        case RIGHT_BUMPER -> controller.rightBumper();
+        case LEFT_STICK -> controller.leftStick();
+        case RIGHT_STICK -> controller.rightStick();
+        case POV_LEFT -> controller.povLeft();
+        case POV_RIGHT -> controller.povRight();
+        case POV_UP -> controller.povUp();
+        case POV_DOWN -> controller.povDown();
+      };
     }
 
     @Override
@@ -186,62 +191,30 @@ public abstract class RBSIController {
     }
   }
 
-  private static final class PS4DriverController extends RBSIController {
-    private final CommandPS4Controller controller;
+  private static final class PS4ControllerAdapter extends RBSIController {
+    private final CommandNiDsPS4Controller controller;
 
-    private PS4DriverController(int port) {
+    private PS4ControllerAdapter(int port) {
       super(port, "PS4");
-      controller = new CommandPS4Controller(port);
+      controller = new CommandNiDsPS4Controller(port);
     }
 
     @Override
-    public Trigger robotRelative() {
-      return controller.circle();
-    }
-
-    @Override
-    public Trigger brake() {
-      return controller.cross();
-    }
-
-    @Override
-    public Trigger xLock() {
-      return controller.square();
-    }
-
-    @Override
-    public Trigger zeroGyro() {
-      return controller.triangle();
-    }
-
-    @Override
-    public Trigger runFlywheel() {
-      return controller.R1();
-    }
-
-    @Override
-    public Trigger autopilotDemo() {
-      return controller.L1();
-    }
-
-    @Override
-    public Trigger povLeft() {
-      return controller.povLeft();
-    }
-
-    @Override
-    public Trigger povRight() {
-      return controller.povRight();
-    }
-
-    @Override
-    public Trigger povUp() {
-      return controller.povUp();
-    }
-
-    @Override
-    public Trigger povDown() {
-      return controller.povDown();
+    protected Trigger button(Button button) {
+      return switch (button) {
+        case SOUTH_FACE -> controller.cross();
+        case EAST_FACE -> controller.circle();
+        case WEST_FACE -> controller.square();
+        case NORTH_FACE -> controller.triangle();
+        case LEFT_BUMPER -> controller.L1();
+        case RIGHT_BUMPER -> controller.R1();
+        case LEFT_STICK -> controller.L3();
+        case RIGHT_STICK -> controller.R3();
+        case POV_LEFT -> controller.povLeft();
+        case POV_RIGHT -> controller.povRight();
+        case POV_UP -> controller.povUp();
+        case POV_DOWN -> controller.povDown();
+      };
     }
 
     @Override
@@ -265,62 +238,30 @@ public abstract class RBSIController {
     }
   }
 
-  private static final class PS5DriverController extends RBSIController {
-    private final CommandPS5Controller controller;
+  private static final class PS5ControllerAdapter extends RBSIController {
+    private final CommandNiDsPS5Controller controller;
 
-    private PS5DriverController(int port) {
+    private PS5ControllerAdapter(int port) {
       super(port, "PS5");
-      controller = new CommandPS5Controller(port);
+      controller = new CommandNiDsPS5Controller(port);
     }
 
     @Override
-    public Trigger robotRelative() {
-      return controller.circle();
-    }
-
-    @Override
-    public Trigger brake() {
-      return controller.cross();
-    }
-
-    @Override
-    public Trigger xLock() {
-      return controller.square();
-    }
-
-    @Override
-    public Trigger zeroGyro() {
-      return controller.triangle();
-    }
-
-    @Override
-    public Trigger runFlywheel() {
-      return controller.R1();
-    }
-
-    @Override
-    public Trigger autopilotDemo() {
-      return controller.L1();
-    }
-
-    @Override
-    public Trigger povLeft() {
-      return controller.povLeft();
-    }
-
-    @Override
-    public Trigger povRight() {
-      return controller.povRight();
-    }
-
-    @Override
-    public Trigger povUp() {
-      return controller.povUp();
-    }
-
-    @Override
-    public Trigger povDown() {
-      return controller.povDown();
+    protected Trigger button(Button button) {
+      return switch (button) {
+        case SOUTH_FACE -> controller.cross();
+        case EAST_FACE -> controller.circle();
+        case WEST_FACE -> controller.square();
+        case NORTH_FACE -> controller.triangle();
+        case LEFT_BUMPER -> controller.L1();
+        case RIGHT_BUMPER -> controller.R1();
+        case LEFT_STICK -> controller.L3();
+        case RIGHT_STICK -> controller.R3();
+        case POV_LEFT -> controller.povLeft();
+        case POV_RIGHT -> controller.povRight();
+        case POV_UP -> controller.povUp();
+        case POV_DOWN -> controller.povDown();
+      };
     }
 
     @Override

@@ -13,19 +13,20 @@
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.simulation.DriverStationSim;
+import org.wpilib.system.Timer;
 
 public class CurrentLimitTests implements AutoCloseable {
   final int CONFIG_RETRY_COUNT = 5;
@@ -42,7 +43,17 @@ public class CurrentLimitTests implements AutoCloseable {
   public void constructDevices() {
     assert HAL.initialize(500, 0);
 
-    talon = new TalonFX(0);
+    talon = new TalonFX(0, new CANBus(""));
+    retryConfigApply(
+        () ->
+            talon
+                .getConfigurator()
+                .apply(
+                    new TalonFXConfiguration()
+                        .withCurrentLimits(
+                            new CurrentLimitsConfigs()
+                                .withStatorCurrentLimitEnable(false)
+                                .withSupplyCurrentLimitEnable(false))));
 
     /* enable the robot */
     DriverStationSim.setEnabled(true);
@@ -60,7 +71,7 @@ public class CurrentLimitTests implements AutoCloseable {
   @Test
   public void robotIsEnabled() {
     /* verify that the robot is enabled */
-    assertTrue(DriverStation.isEnabled());
+    assertTrue(RobotState.isEnabled());
   }
 
   @Test
@@ -72,6 +83,7 @@ public class CurrentLimitTests implements AutoCloseable {
     CurrentLimitsConfigs currentLimitConfigs = toConfigure.CurrentLimits;
     currentLimitConfigs.StatorCurrentLimit = 20;
     currentLimitConfigs.StatorCurrentLimitEnable = false; // Start with stator limits off
+    currentLimitConfigs.SupplyCurrentLimitEnable = false;
 
     retryConfigApply(() -> talon.getConfigurator().apply(toConfigure));
 
@@ -84,7 +96,8 @@ public class CurrentLimitTests implements AutoCloseable {
     statorCurrent.waitForUpdate(1);
 
     System.out.println("Stator current is " + statorCurrent);
-    assertTrue(statorCurrent.getValue() > 100); // Stator current should be in excess of 100 amps
+    assertTrue(
+        statorCurrent.getValueAsDouble() > 100); // Stator current should be in excess of 100 amps
 
     /* Now apply the stator current limit */
     currentLimitConfigs.StatorCurrentLimitEnable = true;
@@ -97,20 +110,19 @@ public class CurrentLimitTests implements AutoCloseable {
     statorCurrent.waitForUpdate(1);
 
     System.out.println("Stator current is " + statorCurrent);
-    assertTrue(statorCurrent.getValue() < 25); // Give some wiggle room
+    assertTrue(statorCurrent.getValueAsDouble() < 25); // Give some wiggle room
   }
 
   @Test
   public void testSupplyLimit() {
     var supplyCurrent = talon.getSupplyCurrent();
 
-    /* Configure a supply limit of 20 amps */
+    /* Configure a supply limit of 5 amps */
     TalonFXConfiguration toConfigure = new TalonFXConfiguration();
     CurrentLimitsConfigs currentLimitConfigs = toConfigure.CurrentLimits;
     currentLimitConfigs.SupplyCurrentLimit = 5;
-    currentLimitConfigs.SupplyCurrentThreshold = 10;
-    currentLimitConfigs.SupplyTimeThreshold = 1.0;
-    currentLimitConfigs.StatorCurrentLimitEnable = false; // Start with supply limits off
+    currentLimitConfigs.SupplyCurrentLimitEnable = false; // Start with supply limits off
+    currentLimitConfigs.StatorCurrentLimitEnable = false;
 
     retryConfigApply(() -> talon.getConfigurator().apply(toConfigure));
 
@@ -123,7 +135,8 @@ public class CurrentLimitTests implements AutoCloseable {
     supplyCurrent.waitForUpdate(1);
 
     System.out.println("Supply current is " + supplyCurrent);
-    assertTrue(supplyCurrent.getValue() > 80); // Supply current should be in excess of 80 amps
+    assertTrue(
+        supplyCurrent.getValueAsDouble() > 80); // Supply current should be in excess of 80 amps
 
     /* Now apply the supply current limit */
     currentLimitConfigs.SupplyCurrentLimitEnable = true;
@@ -135,19 +148,7 @@ public class CurrentLimitTests implements AutoCloseable {
     /* Get the next update for supply current */
     supplyCurrent.waitForUpdate(1);
 
-    System.out.println("Supply current is " + supplyCurrent);
-    assertTrue(
-        supplyCurrent.getValue()
-            > 80); // Make sure it's still over 80 amps (time hasn't exceeded 1 second in total)
-
-    /* Wait a full extra couple seconds so the limit kicks in and starts limiting us */
-    Timer.delay(2);
-
-    /* Get the next update for supply current */
-    supplyCurrent.waitForUpdate(1);
-
-    System.out.println("Supply current is " + supplyCurrent);
-    assertTrue(supplyCurrent.getValue() < 10); // Give some wiggle room
+    assertTrue(supplyCurrent.getValueAsDouble() < 10); // Give some wiggle room
   }
 
   private void retryConfigApply(Supplier<StatusCode> toApply) {
@@ -156,6 +157,6 @@ public class CurrentLimitTests implements AutoCloseable {
     do {
       finalCode = toApply.get();
     } while (!finalCode.isOK() && --triesLeftOver > 0);
-    assert (finalCode.isOK());
+    assertTrue(finalCode.isOK(), "Config apply failed: " + finalCode);
   }
 }
