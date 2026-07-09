@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import frc.robot.subsystems.imu.Imu;
 import frc.robot.subsystems.imu.ImuIOSim;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ class DriveSubsystemTests {
 
   @BeforeEach
   void setupHal() {
+    AutoBuilder.resetForTesting();
     assertTrue(HAL.initialize(500, 0));
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();

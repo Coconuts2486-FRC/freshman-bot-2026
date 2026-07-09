@@ -113,7 +113,7 @@ public class Robot extends LoggedRobot {
 
     // Switch thread to high priority to improve loop timing
     if (isReal()) {
-      Threads.setCurrentThreadPriority(99);
+      setCurrentThreadPriority(99);
     }
   }
 
@@ -124,7 +124,7 @@ public class Robot extends LoggedRobot {
 
     if (isReal()) {
       // Switch thread to high priority to improve loop timing
-      Threads.setCurrentThreadPriority(99);
+      setCurrentThreadPriority(99);
     }
     final long t1 = System.nanoTime();
 
@@ -142,7 +142,7 @@ public class Robot extends LoggedRobot {
 
     if (isReal()) {
       // Return thread to normal priority
-      Threads.setCurrentThreadPriority(10);
+      setCurrentThreadPriority(10);
     }
     final long t4 = System.nanoTime();
 
@@ -267,4 +267,9 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during utility mode. */
   @Override
   public void utilityPeriodic() {}
+
+  @SuppressWarnings("deprecation")
+  private static void setCurrentThreadPriority(int priority) {
+    Threads.setCurrentThreadPriority(priority);
+  }
 }

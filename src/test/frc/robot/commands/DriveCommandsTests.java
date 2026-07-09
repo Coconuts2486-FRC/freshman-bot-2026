@@ -3,6 +3,7 @@ package frc.robot.commands;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.imu.Imu;
@@ -20,6 +21,7 @@ class DriveCommandsTests {
 
   @BeforeEach
   void setupHal() {
+    AutoBuilder.resetForTesting();
     HAL.initialize(500, 0);
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
