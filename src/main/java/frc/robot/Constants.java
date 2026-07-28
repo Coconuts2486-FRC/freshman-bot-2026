@@ -166,8 +166,8 @@ public final class Constants {
   /************************************************************************* */
   /** List of Robot CAN Busses ********************************************* */
   public static final class CANBuses {
-    public static final String RIO = "rio";
-    public static final String DRIVE = "rio";
+    public static final String RIO = "can_s1";
+    public static final String DRIVE = "can_s0";
 
     public static final String[] ALL = {RIO, DRIVE};
   }
@@ -218,8 +218,8 @@ public final class Constants {
     public static final RobotDeviceId FLYWHEEL_LEADER = new RobotDeviceId(3, CANBuses.RIO, 8);
     public static final RobotDeviceId FLYWHEEL_FOLLOWER = new RobotDeviceId(4, CANBuses.RIO, 9);
 
-    public static final RobotDeviceId EXTENDER_MOTOR = new RobotDeviceId(16, 2);
-    public static final RobotDeviceId EXTENDER_ENCODER = new RobotDeviceId(17, null);
+    public static final RobotDeviceId PIVOT_LEADER = new RobotDeviceId(16, 2);
+    public static final RobotDeviceId PIVOT_FOLLOWER = new RobotDeviceId(17, 3);
 
     /* BEAM BREAK and/or LIMIT SWITCH DIO CHANNELS */
     // This is where digital I/O feedback devices are defined
@@ -253,6 +253,8 @@ public final class Constants {
 
     // Joystick Deadbands
     public static final double kJoystickDeadband = 0.1;
+    public static final double kLinearJoystickResponseExponent = 3.0;
+    public static final double kAngularJoystickResponseExponent = 3.0;
     public static final double kTurnSensitivity = 6;
 
     // Joystick slew rate limiters to smooth erratic joystick motions, measured in units per second
@@ -421,6 +423,37 @@ public final class Constants {
 
   /************************************************************************* */
   /** Place Other Mechanism Constant Classes Here ************************** */
+  public static final class ExtenderConstants {
+
+    // Mechanism idle mode
+    public static final MotorIdleMode kIdleMode = MotorIdleMode.BRAKE; // BRAKE, COAST
+
+    // Mechanism motor gear ratio
+    public static final double kGearRatio = 1.0;
+    public static final double kMaxVoltage = 12.0;
+
+    // Extender motor open-loop and closed-loop ramp periods for current smoothing
+    //   Time from from 0 -> full duty
+    public static final double kClosedLoopRampPeriodSecs = 0.15;
+    public static final double kOpenLoopRampPeriodSecs = 0.25;
+
+    // MODE == REAL / REPLAY
+    public static final double kRealP = 1.0;
+    public static final double kRealD = 0.0;
+    public static final double kRealS = 0.0;
+    public static final double kRealV = 0.0;
+    public static final double kRealA = 0.0;
+
+    // MODE == SIM
+    public static final double kSimP = 0.0;
+    public static final double kSimD = 0.0;
+    public static final double kSimS = 0.0;
+    public static final double kSimV = 0.0;
+    public static final double kSimA = 0.0;
+
+    public static final double kDownPositionRad = 0.0;
+  }
+
   // public static class Mechanism1Constants {}
   // public static class Mechanism2Constants {}
   // ...

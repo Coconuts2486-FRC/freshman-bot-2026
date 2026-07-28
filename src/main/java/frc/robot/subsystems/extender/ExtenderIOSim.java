@@ -54,6 +54,7 @@ public class ExtenderIOSim implements ExtenderIO {
     inputs.velocityRadPerSec = sim.getAngularVelocity();
     inputs.appliedVolts = appliedVolts;
     inputs.currentAmps = new double[] {sim.getCurrentDraw()};
+    inputs.extenderConnected = true;
   }
 
   @Override
@@ -69,6 +70,10 @@ public class ExtenderIOSim implements ExtenderIO {
   }
 
   @Override
+  public void setPivotVelocity(double velocityInput) {
+    setPercent(velocityInput);
+  }
+
   public void setVelocity(double velocityRadPerSec) {
     closedLoop = true;
     pid.setSetpoint(velocityRadPerSec);

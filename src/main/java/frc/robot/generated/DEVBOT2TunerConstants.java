@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.signals.*;
 import com.ctre.phoenix6.swerve.*;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.*;
+import frc.robot.Constants.CANBuses;
 import org.wpilib.units.measure.*;
 
 // import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -72,7 +73,7 @@ public class DEVBOT2TunerConstants {
 
   // CAN bus that the devices are located on;
   // All swerve devices must share the same CAN bus
-  public static final CANBus kCANBus = new CANBus("DriveTrain", "./logs/example.hoot");
+  public static final CANBus kCANBus = new CANBus(CANBuses.DRIVE, "./logs/example.hoot");
 
   // Theoretical free speed (m/s) at 12 V applied output;
   // This needs to be tuned to your individual robot

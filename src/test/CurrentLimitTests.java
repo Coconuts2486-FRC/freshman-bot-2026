@@ -19,6 +19,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import frc.robot.Constants.CANBuses;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +44,7 @@ public class CurrentLimitTests implements AutoCloseable {
   public void constructDevices() {
     assert HAL.initialize(500, 0);
 
-    talon = new TalonFX(0, new CANBus(""));
+    talon = new TalonFX(0, new CANBus(CANBuses.RIO));
     retryConfigApply(
         () ->
             talon

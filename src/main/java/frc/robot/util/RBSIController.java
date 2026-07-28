@@ -9,10 +9,13 @@
 package frc.robot.util;
 
 import org.littletonrobotics.junction.Logger;
+import org.wpilib.command2.button.CommandGenericHID;
 import org.wpilib.command2.button.CommandNiDsPS4Controller;
 import org.wpilib.command2.button.CommandNiDsPS5Controller;
 import org.wpilib.command2.button.CommandNiDsXboxController;
 import org.wpilib.command2.button.Trigger;
+import org.wpilib.driverstation.GenericHID.HIDType;
+import org.wpilib.driverstation.POVDirection;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 
 /**
@@ -30,6 +33,8 @@ public abstract class RBSIController {
   private static final String DUALSHOCK_NAME_MARKER = "dualshock";
   private static final String DUALSENSE_NAME_MARKER = "dualsense";
   private static final String WIRELESS_CONTROLLER_NAME = "wireless controller";
+  private static final String LOGITECH_NAME_MARKER = "logitech";
+  private static final String F310_NAME_MARKER = "f310";
 
   private final int port;
   private final String controllerType;
@@ -51,11 +56,21 @@ public abstract class RBSIController {
   }
 
   private static RBSIController createController(int port, String name) {
+    String normalizedName = name == null ? "" : name.toLowerCase();
+    HIDType hidType = HIDType.of(DriverStationBackend.getJoystickGamepadType(port));
+    if (hidType == HIDType.XBOX_360 || hidType == HIDType.XBOX_ONE) {
+      return new XboxControllerAdapter(port);
+    }
+
+    if (normalizedName.contains(LOGITECH_NAME_MARKER)
+        || normalizedName.contains(F310_NAME_MARKER)) {
+      return new LogitechDirectInputAdapter(port);
+    }
+
     if (DriverStationBackend.getJoystickIsGamepad(port)) {
       return new XboxControllerAdapter(port);
     }
 
-    String normalizedName = name == null ? "" : name.toLowerCase();
     if (normalizedName.contains(DUALSENSE_NAME_MARKER)
         || normalizedName.contains(PS5_NAME_MARKER)
         || normalizedName.contains(WIRELESS_CONTROLLER_NAME)) {
@@ -188,6 +203,58 @@ public abstract class RBSIController {
     @Override
     public double getRightY() {
       return controller.getRightY();
+    }
+  }
+
+  private static final class LogitechDirectInputAdapter extends RBSIController {
+    private final CommandGenericHID controller;
+
+    private LogitechDirectInputAdapter(int port) {
+      super(port, "LogitechDirectInput");
+      controller = new CommandGenericHID(port);
+    }
+
+    @Override
+    protected Trigger button(Button button) {
+      return switch (button) {
+        case SOUTH_FACE -> controller.button(0);
+        case EAST_FACE -> controller.button(1);
+        case WEST_FACE -> controller.button(2);
+        case NORTH_FACE -> controller.button(3);
+        case LEFT_BUMPER -> controller.button(4);
+        case RIGHT_BUMPER, LEFT_STICK, RIGHT_STICK -> new Trigger(() -> false);
+        case POV_LEFT -> pov(POVDirection.LEFT);
+        case POV_RIGHT -> pov(POVDirection.RIGHT);
+        case POV_UP -> pov(POVDirection.UP);
+        case POV_DOWN -> pov(POVDirection.DOWN);
+      };
+    }
+
+    private Trigger pov(POVDirection direction) {
+      return new Trigger(
+          () ->
+              controller.getHID().getPOVsAvailable() > 0
+                  && controller.getHID().getPOV() == direction);
+    }
+
+    @Override
+    public double getLeftX() {
+      return controller.getHID().getRawAxis(0);
+    }
+
+    @Override
+    public double getLeftY() {
+      return controller.getHID().getRawAxis(1);
+    }
+
+    @Override
+    public double getRightX() {
+      return controller.getHID().getRawAxis(2);
+    }
+
+    @Override
+    public double getRightY() {
+      return controller.getHID().getRawAxis(3);
     }
   }
 

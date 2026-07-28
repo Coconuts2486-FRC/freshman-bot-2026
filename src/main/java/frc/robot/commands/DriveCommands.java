@@ -179,7 +179,7 @@ public final class DriveCommands {
 
   /** Utility functions needed by commands in this module ****************** */
   /**
-   * Compute the new linear velocity from inputs, including applying deadbands and squaring for
+   * Compute the new linear velocity from inputs, including applying deadbands and shaping for
    * smoothness. Slew limiting is applied by the command factory before calling this helper.
    */
   static Translation2d getLinearVelocity(double x, double y) {
@@ -190,9 +190,9 @@ public final class DriveCommands {
       return Translation2d.kZero;
     }
 
-    // Square magnitude for more precise control
-    // NOTE: The x & y values range from -1 to +1, so their squares are as well
-    double scaledMagnitude = linearMagnitude * linearMagnitude;
+    // Shape magnitude for more precise low-speed control while preserving full speed at full stick.
+    double scaledMagnitude =
+        Math.pow(linearMagnitude, OperatorConstants.kLinearJoystickResponseExponent);
     double inputMagnitude = Math.hypot(x, y);
     double scale = inputMagnitude > 1e-9 ? scaledMagnitude / inputMagnitude : 0.0;
 
@@ -201,12 +201,13 @@ public final class DriveCommands {
   }
 
   /**
-   * Compute the new angular velocity from inputs, including applying deadbands and squaring for
+   * Compute the new angular velocity from inputs, including applying deadbands and shaping for
    * smoothness. Slew limiting is applied by the command factory before calling this helper.
    */
   static double getOmega(double omega) {
     omega = MathUtil.applyDeadband(omega, OperatorConstants.kJoystickDeadband);
-    return Math.copySign(omega * omega, omega);
+    return Math.copySign(
+        Math.pow(Math.abs(omega), OperatorConstants.kAngularJoystickResponseExponent), omega);
   }
 
   private static SlewRateLimiter joystickLimiter() {

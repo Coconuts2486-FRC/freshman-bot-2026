@@ -16,6 +16,7 @@
 package frc.robot.util;
 
 import com.ctre.phoenix6.CANBus;
+import frc.robot.Constants.CANBuses;
 import java.util.Objects;
 
 /**
@@ -34,9 +35,9 @@ public class RobotDeviceId {
     m_PowerPort = powerPort;
   }
 
-  /** Use the default bus name (empty string) */
+  /** Use the configured default robot CAN bus. */
   public RobotDeviceId(int CANdeviceNumber, Integer powerPort) {
-    this(CANdeviceNumber, "", powerPort);
+    this(CANdeviceNumber, CANBuses.RIO, powerPort);
   }
 
   /** Get the CAN ID value for a named device */

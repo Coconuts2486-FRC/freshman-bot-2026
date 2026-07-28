@@ -28,7 +28,7 @@ class DriveCommandsTests {
   }
 
   @Test
-  void linearVelocityAppliesDeadbandAndSquaresMagnitudeWithoutChangingDirection() {
+  void linearVelocityAppliesDeadbandAndShapesMagnitudeWithoutChangingDirection() {
     assertEquals(Translation2d.kZero, DriveCommands.getLinearVelocity(0.01, 0.01));
 
     Translation2d velocity = DriveCommands.getLinearVelocity(0.6, 0.8);
@@ -40,10 +40,11 @@ class DriveCommandsTests {
   @Test
   void omegaAppliesDeadbandAndPreservesSignWhenSquared() {
     double scaled = MathUtil.applyDeadband(0.5, OperatorConstants.kJoystickDeadband);
+    double shaped = Math.pow(scaled, OperatorConstants.kAngularJoystickResponseExponent);
 
     assertEquals(0.0, DriveCommands.getOmega(0.01), EPSILON);
-    assertEquals(scaled * scaled, DriveCommands.getOmega(0.5), EPSILON);
-    assertEquals(-(scaled * scaled), DriveCommands.getOmega(-0.5), EPSILON);
+    assertEquals(shaped, DriveCommands.getOmega(0.5), EPSILON);
+    assertEquals(-shaped, DriveCommands.getOmega(-0.5), EPSILON);
   }
 
   @Test

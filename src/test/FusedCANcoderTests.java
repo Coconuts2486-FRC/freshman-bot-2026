@@ -21,6 +21,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import frc.robot.Constants.CANBuses;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,8 +38,8 @@ public class FusedCANcoderTests {
   public void constructDevices() {
     assert HAL.initialize(500, 0);
 
-    talon = new TalonFX(0, new CANBus(""));
-    cancoder = new CANcoder(0, new CANBus(""));
+    talon = new TalonFX(0, new CANBus(CANBuses.RIO));
+    cancoder = new CANcoder(0, new CANBus(CANBuses.RIO));
   }
 
   @Test

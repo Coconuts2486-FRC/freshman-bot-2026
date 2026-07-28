@@ -1,6 +1,5 @@
 package frc.robot.subsystems.extender;
 
-import frc.robot.subsystems.flywheel_example.FlywheelIO.FlywheelIOInputs;
 import frc.robot.util.RBSIIO;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -11,7 +10,7 @@ public interface ExtenderIO extends RBSIIO {
     public double velocityRadPerSec = 0.0;
     public double appliedVolts = 0.0;
     public double[] currentAmps = new double[] {};
-    public boolean extenderConected = false;
+    public boolean extenderConnected = false;
   }
 
   public default void updateInputs(ExtenderIOInputs inputs) {}
@@ -31,17 +30,6 @@ public interface ExtenderIO extends RBSIIO {
   }
 
   public default void goUntilPosition(double position) {}
-
-  /** Updates the set of loggable inputs. */
-  public default void updateInputs(FlywheelIOInputs inputs) {}
-
-  /** Run closed loop at the specified velocity. */
-  public default void setVelocity(double velocityRadPerSec) {}
-
-  /** Run closed loop at the specified velocity using a profiled/smoothed velocity request. */
-  public default void setVelocityProfiled(double velocityRadPerSec) {
-    setVelocity(velocityRadPerSec);
-  }
 
   /** Set gain constants */
   public default void configureGains(double kP, double kI, double kD, double kS, double kV) {}

@@ -28,12 +28,10 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-import org.littletonrobotics.urcl.URCL;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchState;
-import org.wpilib.system.Threads;
 import org.wpilib.system.Timer;
 
 /**
@@ -44,6 +42,7 @@ import org.wpilib.system.Timer;
  */
 public class Robot extends LoggedRobot {
   private static final int TIMING_LOG_PERIOD_LOOPS = 5;
+  private static final String SYSTEMCORE_LOG_PATH = "/home/systemcore/logs";
 
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
@@ -75,8 +74,8 @@ public class Robot extends LoggedRobot {
     // Set up data receivers & replay source
     switch (Constants.getMode()) {
       case REAL:
-        // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter());
+        // Running on SystemCore, log to a writable folder on the controller.
+        Logger.addDataReceiver(new WPILOGWriter(SYSTEMCORE_LOG_PATH));
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
@@ -95,7 +94,7 @@ public class Robot extends LoggedRobot {
     }
 
     // Initialize URCL
-    Logger.registerURCL(URCL.startExternal());
+    // Logger.registerURCL(URCL.startExternal());
     StatusLogger.disableAutoLogging(); // Disable REVLib's built-in logging
     LoggedPowerDistribution.getInstance(
         PowerConstants.kPdmCanId, PowerConstants.kPdmChannelCount, PowerConstants.kPdmType);
@@ -270,6 +269,6 @@ public class Robot extends LoggedRobot {
 
   @SuppressWarnings("deprecation")
   private static void setCurrentThreadPriority(int priority) {
-    Threads.setCurrentThreadPriority(priority);
+    // SystemCore alpha currently reports HAL -1152 for thread-priority changes.
   }
 }

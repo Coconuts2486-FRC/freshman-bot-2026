@@ -19,6 +19,7 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import frc.robot.Constants.CANBuses;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.wpilib.hardware.hal.HAL;
@@ -34,8 +35,8 @@ public class LatencyCompensationTests {
   public void constructDevices() {
     assert HAL.initialize(500, 0);
 
-    talonfx = new TalonFX(0, new CANBus(""));
-    cancoder = new CANcoder(0, new CANBus(""));
+    talonfx = new TalonFX(0, new CANBus(CANBuses.RIO));
+    cancoder = new CANcoder(0, new CANBus(CANBuses.RIO));
   }
 
   @Test

@@ -1,6 +1,10 @@
 package frc.robot.subsystems.extender;
 
+import static frc.robot.Constants.ExtenderConstants.*;
+
+import frc.robot.Constants;
 import frc.robot.util.RBSISubsystem;
+import org.littletonrobotics.junction.Logger;
 
 public class Extender extends RBSISubsystem {
   private final ExtenderIO io;
@@ -8,19 +12,31 @@ public class Extender extends RBSISubsystem {
 
   public Extender(ExtenderIO io) {
     this.io = io;
+
+    switch (Constants.getMode()) {
+      case REAL:
+      case REPLAY:
+        io.configureGains(kRealP, 0.0, kRealD, kRealS, kRealV, kRealA);
+        break;
+      case SIM:
+      default:
+        io.configureGains(kSimP, 0.0, kSimD, kSimS, kSimV, kSimA);
+        break;
+    }
   }
 
   @Override
   protected void rbsiPeriodic() {
     io.updateInputs(inputs);
+    Logger.processInputs("Extender", inputs);
   }
 
   public void configPID(double kP, double kI, double kD) {
     io.configPID(kP, kI, kD);
   }
 
-  public void setPivotVelocity(double veloccityInput) {
-    io.setPivotVelocity(veloccityInput);
+  public void setPivotVelocity(double velocityInput) {
+    io.setPivotVelocity(velocityInput);
   }
 
   public void stopPivot() {
@@ -28,11 +44,11 @@ public class Extender extends RBSISubsystem {
   }
 
   public double downPos() {
-    return 0.0;
+    return io.downPos();
   }
 
   public boolean isExtenderAlive() {
-    return inputs.extenderConected;
+    return inputs.extenderConnected;
   }
 
   // * power port fucntion */
