@@ -13,13 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Marowak(start"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Marowak(push)"
+            "pathName": null
           }
         }
       ]

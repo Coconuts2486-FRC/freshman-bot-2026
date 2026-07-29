@@ -13,13 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Lycanroc(start)"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Lycanroc(push)"
+            "pathName": null
           }
         }
       ]

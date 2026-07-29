@@ -5,15 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Zero"
+            "pathName": "Trench to corner of balls"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Arboc"
+            "pathName": "Spin through fuel"
           }
         }
       ]

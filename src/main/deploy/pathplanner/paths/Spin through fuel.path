@@ -3,48 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.4050641940085593,
-        "y": 4.300242510699002
+        "x": 7.885848282425492,
+        "y": 5.944970781114367
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.9910271041369465,
-        "y": 5.400028530670471
+        "x": 7.866207939084241,
+        "y": 5.66289184851729
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.31077032810271,
-        "y": 7.431398002853067
+        "x": 8.070560384114584,
+        "y": 1.8961376501012728
       },
       "prevControl": {
-        "x": 1.7230385164051354,
-        "y": 7.6125392296718974
-      },
-      "nextControl": {
-        "x": 5.215463324024593,
-        "y": 7.368069493138535
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 7.843024251069899,
-        "y": 7.224379457917262
-      },
-      "prevControl": {
-        "x": 7.066704707560627,
-        "y": 8.117146932952924
+        "x": 7.758054131529415,
+        "y": 2.135836579541131
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "marowak(start)"
+      "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.25,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 0.75,
+      "rotationDegrees": 90.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -61,7 +58,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "trench push start",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
