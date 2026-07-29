@@ -3,64 +3,53 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.7026533523537797,
-        "y": 2.320627674750357
+        "x": 4.415513467294199,
+        "y": 7.441258441501194
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.702653352353781,
-        "y": 2.320627674750357
+        "x": 5.641920589908832,
+        "y": 7.276729252991643
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.584251069900143,
-        "y": 2.320627674750357
+        "x": 6.730058269359448,
+        "y": 7.1372802316171144
       },
       "prevControl": {
-        "x": 6.584251069900143,
-        "y": 2.320627674750357
+        "x": 6.469751310220456,
+        "y": 7.19303718228093
       },
       "nextControl": {
-        "x": 8.584251069900143,
-        "y": 2.320627674750357
+        "x": 7.670064503269136,
+        "y": 6.935933785171186
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.584251069900143,
-        "y": 5.904636233951498
+        "x": 8.235938907199436,
+        "y": 5.9392262714527275
       },
       "prevControl": {
-        "x": 8.071312410841655,
-        "y": 5.833473609129815
-      },
-      "nextControl": {
-        "x": 7.0971897289586305,
-        "y": 5.975798858773182
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 5.59169757489301,
-        "y": 5.775249643366619
-      },
-      "prevControl": {
-        "x": 5.341906766489274,
-        "y": 5.785474712413235
+        "x": 7.665493333561863,
+        "y": 6.895463690297407
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Corner of Balls"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": 0.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -74,10 +63,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -90.0
   },
   "reversed": false,
-  "folder": "bump push",
+  "folder": "blue left side",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
