@@ -19,7 +19,6 @@ package frc.robot;
 
 import com.revrobotics.util.StatusLogger;
 import frc.robot.Constants.PowerConstants;
-import frc.robot.util.TimeUtil;
 import frc.robot.util.VirtualSubsystem;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedPowerDistribution;
@@ -181,7 +180,6 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().cancelAll();
     m_robotContainer.getDrivebase().setMotorBrake(true);
     m_robotContainer.getDrivebase().resetHeadingController();
-    m_robotContainer.getVision().resetPoseGate(TimeUtil.now());
 
     // Do not zero the gyro here. PathPlanner and Choreo reset through Drive.resetPose(...), which
     // aligns the pose estimator to the selected auto's start while preserving the gyro reference.
@@ -233,26 +231,19 @@ public class Robot extends LoggedRobot {
     //
     // https://docs.wpilib.org/en/stable/docs/yearly-overview/2026-game-data.html
     if (FieldState.wonAuto == null) {
-      // Only call this code block if the signal from FMS has not yet arrived
-      String gameData = MatchState.getGameData().orElse("");
-      if (gameData.length() > 0) {
-        switch (gameData.charAt(0)) {
-          case 'B':
-            // Blue case code
-            FieldState.wonAuto = Alliance.BLUE;
-            break;
-          case 'R':
-            // Red case code
-            FieldState.wonAuto = Alliance.RED;
-            break;
-          default:
-            // This is corrupt data, do nothing
-            break;
-        }
-      }
+      FieldState.wonAuto = parseAutoWinner(MatchState.getGameData().orElse(""));
     }
-    // Anything else for the teleopPeriodic() function
+  }
 
+  private static Alliance parseAutoWinner(String gameData) {
+    if (gameData.isEmpty()) {
+      return null;
+    }
+    return switch (gameData.charAt(0)) {
+      case 'B' -> Alliance.BLUE;
+      case 'R' -> Alliance.RED;
+      default -> null;
+    };
   }
 
   /** This function is called once when utility mode is enabled. */

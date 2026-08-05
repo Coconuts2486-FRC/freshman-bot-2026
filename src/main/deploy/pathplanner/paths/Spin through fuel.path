@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.251244680889387,
-        "y": 5.458214581656621
+        "x": 8.298523437440156,
+        "y": 5.343726107739348
       },
       "isLocked": false,
       "linkedName": "Corner of Balls"
@@ -20,8 +20,8 @@
         "y": 1.2961662371600118
       },
       "prevControl": {
-        "x": 8.27765524415489,
-        "y": 6.960712564829934
+        "x": 8.457750482035035,
+        "y": 7.086785237317311
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,15 +30,15 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.25,
+      "waypointRelativePos": 0.3958152369449017,
       "rotationDegrees": 180.0
     },
     {
-      "waypointRelativePos": 0.5,
+      "waypointRelativePos": 0.5974227102179274,
       "rotationDegrees": 90.0
     },
     {
-      "waypointRelativePos": 0.75,
+      "waypointRelativePos": 0.9037376002261518,
       "rotationDegrees": 0.0
     },
     {
