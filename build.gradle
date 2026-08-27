@@ -12,6 +12,14 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+sourceSets {
+    test {
+        java {
+            srcDirs = ['src/test']
+        }
+    }
+}
+
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
@@ -42,14 +50,6 @@ deploy {
                     // jvmArgs.add("-Xmx" + MAX_JAVA_HEAP_SIZE_MB + "M")
                     // jvmArgs.add("-Xms" + MAX_JAVA_HEAP_SIZE_MB + "M")
                     // jvmArgs.add("-XX:+AlwaysPreTouch")
-
-                    // // These allow for integration with VisualVM
-                    // jvmArgs.add("-Dcom.sun.management.jmxremote=true")
-                    // jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
-                    // jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
-                    // jvmArgs.add("-Dcom.sun.management.jmxremote.ssl=false")
-                    // jvmArgs.add("-Dcom.sun.management.jmxremote.authenticate=false")
-                    // jvmArgs.add("-Djava.rmi.server.hostname=10.24.86.2")
                 }
 
                 // Static files artifact
@@ -183,26 +183,53 @@ createVersionFile.dependsOn(eventDeploy)
 // Spotless formatting
 project.compileJava.dependsOn(spotlessApply)
 spotless {
+    enforceCheck true
     java {
-        target "src/**/*.java"
-        targetExclude "src/main/java/frc/robot/BuildConstants.java"
+        target fileTree('.') {
+            include '**/*.java'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        importOrder()
+        toggleOffOn()
         googleJavaFormat()
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
     }
-
     groovyGradle {
-        target "*.gradle"
+        target fileTree('.') {
+            include '**/*.gradle'
+            exclude '**/build/**', '**/build-*/**'
+        }
         greclipse()
         leadingTabsToSpaces(4)
         trimTrailingWhitespace()
         endWithNewline()
     }
-
-    format "misc", {
-        target "*.md", "doc/**/*.md", ".github/**/*.yml", ".github/**/*.yaml"
+    json {
+        target fileTree('.'){
+            include '**/*.json'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        gson().indentWithSpaces(2)
+    }
+    format 'xml', {
+        target fileTree('.') {
+            include '**/*.xml'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        eclipseWtp('xml')
         trimTrailingWhitespace()
+        leadingTabsToSpaces(2)
+        endWithNewline()
+    }
+    format "misc", {
+        target fileTree('.') {
+            include '**/*.md', '**/.gitignore'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        trimTrailingWhitespace()
+        leadingTabsToSpaces(2)
         endWithNewline()
     }
 }
