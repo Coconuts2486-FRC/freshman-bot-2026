@@ -23,6 +23,7 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -47,12 +48,8 @@ import frc.robot.subsystems.drive.DriveOdometry;
 import frc.robot.subsystems.drive.SwerveConstants;
 import frc.robot.subsystems.extender.Extender;
 import frc.robot.subsystems.extender.ExtenderIO;
+import frc.robot.subsystems.extender.ExtenderIOPCM;
 import frc.robot.subsystems.extender.ExtenderIOSim;
-import frc.robot.subsystems.extender.ExtenderIOTalonFX;
-import frc.robot.subsystems.flywheel_example.Flywheel;
-import frc.robot.subsystems.flywheel_example.FlywheelIO;
-import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
-import frc.robot.subsystems.flywheel_example.FlywheelIOTalonFX;
 import frc.robot.subsystems.imu.Imu;
 import frc.robot.subsystems.imu.ImuIO;
 import frc.robot.subsystems.imu.ImuIOSim;
@@ -101,7 +98,6 @@ public class RobotContainer {
   private final Drive m_drivebase;
 
   private final Extender m_extender;
-  private final Flywheel m_flywheel;
 
   // ... Add additional subsystems here (e.g., elevator, arm, etc.)
 
@@ -164,10 +160,7 @@ public class RobotContainer {
         m_vision =
             new Vision(
                 m_drivebase, m_drivebase::addVisionMeasurement, buildVisionIOsReal(m_drivebase));
-        m_extender =
-            new Extender(new ExtenderIOTalonFX()); // new Flywheel(new FlywheelIOTalonFX());
-        m_flywheel =
-            new Flywheel(new FlywheelIOTalonFX()); // new Flywheel(new FlywheelIOTalonFX());
+        m_extender = new Extender(new ExtenderIOPCM());
         m_accel = new Accelerometer(m_imu);
         sweep = null;
         break;
@@ -182,7 +175,6 @@ public class RobotContainer {
             new Vision(
                 m_drivebase, m_drivebase::addVisionMeasurement, buildVisionIOsSim(m_drivebase));
         m_extender = new Extender(new ExtenderIOSim());
-        m_flywheel = new Flywheel(new FlywheelIOSim());
         m_accel = new Accelerometer(m_imu);
 
         // CameraSweepEvaluator uses isolated sweep-only Photon cameras to avoid colliding with
@@ -217,7 +209,6 @@ public class RobotContainer {
                 m_drivebase, m_drivebase::addVisionMeasurement, buildVisionIOsReplay(m_drivebase));
 
         m_extender = new Extender(new ExtenderIO() {});
-        m_flywheel = new Flywheel(new FlywheelIO() {});
         m_accel = new Accelerometer(m_imu, RioAccelIO.noop());
         sweep = null;
         break;
@@ -294,8 +285,8 @@ public class RobotContainer {
 
   /** Use this method to define your Autonomous commands for use with PathPlanner / Choreo */
   private void defineAutoCommands() {
-
-    // NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
+    NamedCommands.registerCommand(
+        "Zero", Commands.runOnce(m_drivebase::zeroHeadingForAlliance, m_drivebase));
   }
 
   /**
@@ -331,14 +322,7 @@ public class RobotContainer {
     // Press Y / Triangle button --> Manually Re-Zero the Gyro
     driverController.zeroGyro().onTrue(DriveCommands.zeroHeadingForAlliance(m_drivebase));
 
-    // Press RIGHT BUMPER / R1 --> Run the example flywheel
-    driverController
-        .runFlywheel()
-        .whileTrue(
-            Commands.startEnd(
-                () -> m_flywheel.runVelocity(flywheelSpeedInput.get()),
-                m_flywheel::stop,
-                m_flywheel));
+    // Place your Blocker extend / retract command trigger here!!!
 
     // Press LEFT BUMPER / L1 --> Drive to a demo pose offset defined in OperatorConstants
     driverController
@@ -496,32 +480,6 @@ public class RobotContainer {
       autoChooserPathPlanner.addOption(
           "Drive SysId (Dynamic Reverse)",
           m_drivebase.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-      // Example Flywheel SysId Characterization
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId Voltage (Quasistatic Forward)",
-          m_flywheel.sysIdVoltageQuasistatic(SysIdRoutine.Direction.kForward));
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId Voltage (Quasistatic Reverse)",
-          m_flywheel.sysIdVoltageQuasistatic(SysIdRoutine.Direction.kReverse));
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId Voltage (Dynamic Forward)",
-          m_flywheel.sysIdVoltageDynamic(SysIdRoutine.Direction.kForward));
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId Voltage (Dynamic Reverse)",
-          m_flywheel.sysIdVoltageDynamic(SysIdRoutine.Direction.kReverse));
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId Duty Cycle (Quasistatic Forward)",
-          m_flywheel.sysIdDutyCycleQuasistatic(SysIdRoutine.Direction.kForward));
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId Duty Cycle (Quasistatic Reverse)",
-          m_flywheel.sysIdDutyCycleQuasistatic(SysIdRoutine.Direction.kReverse));
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId Duty Cycle (Dynamic Forward)",
-          m_flywheel.sysIdDutyCycleDynamic(SysIdRoutine.Direction.kForward));
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId Duty Cycle (Dynamic Reverse)",
-          m_flywheel.sysIdDutyCycleDynamic(SysIdRoutine.Direction.kReverse));
     }
   }
 

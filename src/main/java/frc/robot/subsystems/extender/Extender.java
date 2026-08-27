@@ -15,20 +15,12 @@ public class Extender extends RBSISubsystem {
     io.updateInputs(inputs);
   }
 
-  public void configPID(double kP, double kI, double kD) {
-    io.configPID(kP, kI, kD);
+  public void extendBlocker() {
+    io.extendBlocker();
   }
 
-  public void setPivotVelocity(double veloccityInput) {
-    io.setPivotVelocity(veloccityInput);
-  }
-
-  public void stopPivot() {
-    io.setPivotVelocity(0);
-  }
-
-  public double downPos() {
-    return 0.0;
+  public void retractBlocker() {
+    io.retractBlocker();
   }
 
   public boolean isExtenderAlive() {
