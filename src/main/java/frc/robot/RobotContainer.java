@@ -322,7 +322,8 @@ public class RobotContainer {
     // Press Y / Triangle button --> Manually Re-Zero the Gyro
     driverController.zeroGyro().onTrue(DriveCommands.zeroHeadingForAlliance(m_drivebase));
 
-    // Place your Blocker extend / retract command trigger here!!!
+    // Press RIGHT BUMPER / R1 --> Toggle the extender
+    driverController.extenderToggle().onTrue(m_extender.runOnce(m_extender::toggleBlocker));
 
     // Press LEFT BUMPER / L1 --> Drive to a demo pose offset defined in OperatorConstants
     driverController

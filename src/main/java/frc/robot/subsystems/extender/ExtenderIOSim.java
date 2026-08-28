@@ -9,4 +9,10 @@
 
 package frc.robot.subsystems.extender;
 
-public class ExtenderIOSim implements ExtenderIO {}
+public class ExtenderIOSim implements ExtenderIO {
+  @Override
+  public void updateInputs(ExtenderIOInputs inputs) {
+    inputs.compressorConnected = true;
+    inputs.compressorConfig = "Digital";
+  }
+}

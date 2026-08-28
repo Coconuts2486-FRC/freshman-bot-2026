@@ -87,7 +87,7 @@ public abstract class RBSIController {
 
   public abstract Trigger zeroGyro();
 
-  public abstract Trigger runFlywheel();
+  public abstract Trigger extenderToggle();
 
   public abstract Trigger autopilotDemo();
 
@@ -136,7 +136,7 @@ public abstract class RBSIController {
     }
 
     @Override
-    public Trigger runFlywheel() {
+    public Trigger extenderToggle() {
       return controller.rightBumper();
     }
 
@@ -215,7 +215,7 @@ public abstract class RBSIController {
     }
 
     @Override
-    public Trigger runFlywheel() {
+    public Trigger extenderToggle() {
       return controller.R1();
     }
 
@@ -294,7 +294,7 @@ public abstract class RBSIController {
     }
 
     @Override
-    public Trigger runFlywheel() {
+    public Trigger extenderToggle() {
       return controller.R1();
     }
 

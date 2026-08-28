@@ -9,9 +9,23 @@
 
 package frc.robot.subsystems.extender;
 
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PneumaticsControlModule;
+import edu.wpi.first.wpilibj.Solenoid;
+
 public class ExtenderIOPCM implements ExtenderIO {
 
-  // Define the hardware from the RobotDevices section of RobotContainer
+  private static final int kPcmCanId = 24;
+  private static final int kBlockerSolenoidChannel = 7;
+
+  // Own one PCM instance so its output and fault telemetry can be logged alongside the mechanism.
+  private final PneumaticsControlModule pcm = new PneumaticsControlModule(kPcmCanId);
+
+  // Creating the compressor/solenoid enables the PCM's digital closed-loop compressor control.
+  public final Compressor m_compressor = pcm.makeCompressor();
+
+  // The solenoid for the blocker is in port #7 on the PCM.
+  public final Solenoid m_solenoid = pcm.makeSolenoid(kBlockerSolenoidChannel);
 
   // IMPORTANT: Include here all devices listed above that are part of this mechanism!
   public final int[] powerPorts = {};
@@ -28,17 +42,37 @@ public class ExtenderIOPCM implements ExtenderIO {
 
   @Override
   public void updateInputs(ExtenderIOInputs inputs) {
-    // Include here any inputs you have
+    inputs.compressorEnabled = pcm.getCompressor();
+    inputs.pressureSwitchLow = pcm.getPressureSwitch();
+    inputs.compressorCurrentAmps = pcm.getCompressorCurrent();
+    inputs.compressorConfig = pcm.getCompressorConfigType().toString();
 
+    inputs.compressorCurrentTooHighFault = pcm.getCompressorCurrentTooHighFault();
+    inputs.compressorCurrentTooHighStickyFault = pcm.getCompressorCurrentTooHighStickyFault();
+    inputs.compressorShortedFault = pcm.getCompressorShortedFault();
+    inputs.compressorShortedStickyFault = pcm.getCompressorShortedStickyFault();
+    inputs.compressorNotConnectedFault = pcm.getCompressorNotConnectedFault();
+    inputs.compressorNotConnectedStickyFault = pcm.getCompressorNotConnectedStickyFault();
+    inputs.compressorConnected = !inputs.compressorNotConnectedFault;
+
+    inputs.blockerSolenoidEnabled = m_solenoid.get();
+    inputs.solenoidOutputMask = pcm.getSolenoids();
+    inputs.solenoidDisabledMask = pcm.getSolenoidDisabledList();
+    inputs.blockerSolenoidDisabled =
+        (inputs.solenoidDisabledMask & (1 << kBlockerSolenoidChannel)) != 0;
+    inputs.solenoidVoltageFault = pcm.getSolenoidVoltageFault();
+    inputs.solenoidVoltageStickyFault = pcm.getSolenoidVoltageStickyFault();
   }
 
   @Override
   public void extendBlocker() {
-    // Do something!
+    // Set to true to activate the solenoid, extending the blocker
+    m_solenoid.set(true);
   }
 
   @Override
   public void retractBlocker() {
-    // Do something!
+    // Set to false to deactivate the solenoid, retracting the blocker
+    m_solenoid.set(false);
   }
 }
