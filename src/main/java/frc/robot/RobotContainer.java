@@ -325,6 +325,9 @@ public class RobotContainer {
     // Press RIGHT BUMPER / R1 --> Toggle the extender
     driverController.extenderToggle().onTrue(m_extender.runOnce(m_extender::toggleBlocker));
 
+    // Press A on the Operator Controller --> Toggle the extender
+    operatorController.brake().onTrue(m_extender.runOnce(m_extender::toggleBlocker));
+
     // Press LEFT BUMPER / L1 --> Drive to a demo pose offset defined in OperatorConstants
     driverController
         .autopilotDemo()
@@ -372,6 +375,9 @@ public class RobotContainer {
         .whileTrue(
             DriveCommands.robotRelativeNudge(
                 m_drivebase, -OperatorConstants.kRobotRelativeNudgeSpeedMetersPerSec, 0.0, 0.0));
+
+
+
 
     if (Constants.getMode() == Mode.SIM) {
       // IN SIMULATION ONLY:
