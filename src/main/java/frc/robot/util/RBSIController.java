@@ -132,7 +132,7 @@ public abstract class RBSIController {
 
     @Override
     public Trigger zeroGyro() {
-      return controller.y();
+      return controller.leftBumper();
     }
 
     @Override
@@ -142,7 +142,7 @@ public abstract class RBSIController {
 
     @Override
     public Trigger autopilotDemo() {
-      return controller.leftBumper();
+      return controller.y();
     }
 
     @Override
@@ -211,7 +211,7 @@ public abstract class RBSIController {
 
     @Override
     public Trigger zeroGyro() {
-      return controller.triangle();
+      return controller.L1();
     }
 
     @Override
@@ -221,7 +221,7 @@ public abstract class RBSIController {
 
     @Override
     public Trigger autopilotDemo() {
-      return controller.L1();
+      return controller.triangle();
     }
 
     @Override
@@ -290,7 +290,7 @@ public abstract class RBSIController {
 
     @Override
     public Trigger zeroGyro() {
-      return controller.triangle();
+      return controller.L1();
     }
 
     @Override
@@ -300,7 +300,7 @@ public abstract class RBSIController {
 
     @Override
     public Trigger autopilotDemo() {
-      return controller.L1();
+      return controller.triangle();
     }
 
     @Override
