@@ -13,13 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "lumineon (short)"
+            "pathName": "Mr.Mime(short)"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "bump disrupt",
+  "folder": null,
   "choreoAuto": false
 }

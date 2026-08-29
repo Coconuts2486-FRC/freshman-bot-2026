@@ -13,13 +13,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "MudBray long"
+            "pathName": "right disruption auto start"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "right diruption auto"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "bump push",
+  "folder": null,
   "choreoAuto": false
 }

@@ -13,19 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "aeRodactyle(start)"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "aeRodactyle(long)"
+            "pathName": "lumineon (long)"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "trench push",
+  "folder": null,
   "choreoAuto": false
 }

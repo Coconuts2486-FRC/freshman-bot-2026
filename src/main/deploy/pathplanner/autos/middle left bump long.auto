@@ -13,13 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Mr.Mime(short)"
+            "pathName": "MudBray long"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "trench disrupt",
+  "folder": null,
   "choreoAuto": false
 }

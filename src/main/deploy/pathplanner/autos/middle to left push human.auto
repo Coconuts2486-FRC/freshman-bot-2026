@@ -13,13 +13,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "beedRill(short)"
+            "pathName": "Marowak(start"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Marowak(push)"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "bump disrupt",
+  "folder": null,
   "choreoAuto": false
 }

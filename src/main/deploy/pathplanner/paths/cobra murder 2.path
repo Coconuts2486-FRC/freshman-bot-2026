@@ -1,0 +1,63 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.231184022824536,
+        "y": 7.483152639087019
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 8.244122681883024,
+        "y": 5.76231098430813
+      },
+      "isLocked": false,
+      "linkedName": "center left stop"
+    },
+    {
+      "anchor": {
+        "x": 8.231184022824536,
+        "y": 0.6774179743223976
+      },
+      "prevControl": {
+        "x": 8.295877318116975,
+        "y": 1.9324679029957206
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "center right stop"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.26226012793176967,
+      "rotationDegrees": 25.0
+    },
+    {
+      "waypointRelativePos": 0.5927505330490325,
+      "rotationDegrees": 45.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 22.306205054907494
+  },
+  "reversed": false,
+  "folder": "cobra murder",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

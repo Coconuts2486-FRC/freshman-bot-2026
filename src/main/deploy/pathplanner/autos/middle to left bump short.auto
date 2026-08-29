@@ -13,13 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "beedRill(long)"
+            "pathName": "MudBray(short)"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "bump push",
+  "folder": null,
   "choreoAuto": false
 }

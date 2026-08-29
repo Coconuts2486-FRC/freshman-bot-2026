@@ -13,13 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "aeRodactyle(short)"
+            "pathName": "right short "
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "trench disrupt",
+  "folder": null,
   "choreoAuto": false
 }

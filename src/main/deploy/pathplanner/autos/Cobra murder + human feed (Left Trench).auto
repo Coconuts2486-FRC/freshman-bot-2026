@@ -5,27 +5,33 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Zero"
+            "pathName": "cobra murder 1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.5
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Marowak(start"
+            "pathName": "cobra murder 2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Marowak(push)"
+            "pathName": "cobra murder 3"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "trench push",
+  "folder": null,
   "choreoAuto": false
 }

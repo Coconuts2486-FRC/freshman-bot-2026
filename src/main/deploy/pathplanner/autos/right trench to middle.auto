@@ -5,21 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Zero"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "lumineon (long)"
+            "pathName": "test path"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "bump push",
+  "folder": null,
   "choreoAuto": false
 }

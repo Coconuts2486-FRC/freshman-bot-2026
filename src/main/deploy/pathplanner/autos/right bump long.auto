@@ -13,19 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Lycanroc(start)"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Lycanroc(push)"
+            "pathName": "beedRill(long)"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "trench push",
+  "folder": null,
   "choreoAuto": false
 }
