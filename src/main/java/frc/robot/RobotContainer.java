@@ -376,9 +376,6 @@ public class RobotContainer {
             DriveCommands.robotRelativeNudge(
                 m_drivebase, -OperatorConstants.kRobotRelativeNudgeSpeedMetersPerSec, 0.0, 0.0));
 
-
-
-
     if (Constants.getMode() == Mode.SIM) {
       // IN SIMULATION ONLY:
       // Double-press the A button on Joystick3 to run the CameraSweepEvaluator

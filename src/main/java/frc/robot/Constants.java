@@ -25,6 +25,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.therekrab.autopilot.APConstraints;
 import com.therekrab.autopilot.APProfile;
 import com.therekrab.autopilot.Autopilot;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -75,8 +76,7 @@ public final class Constants {
   private static SwerveType swerveType = SwerveType.PHOENIX6; // PHOENIX6, YAGSL
   private static CTREPro phoenixPro = CTREPro.LICENSED; // LICENSED, UNLICENSED
   private static AutoType autoType = AutoType.PATHPLANNER; // MANUAL, PATHPLANNER, CHOREO
-  // This robot currently runs odometry-only: no cameras or vision coprocessors are installed.
-  private static VisionType visionType = VisionType.NONE; // PHOTON, LIMELIGHT, NONE
+  private static VisionType visionType = VisionType.PHOTON; // PHOTON, LIMELIGHT, NONE
 
   /** Enumerate the robot types (name your robots here) */
   public static enum RobotType {
@@ -520,9 +520,45 @@ public final class Constants {
         double stdDevFactor,
         SimCameraProperties simProps) {}
 
-    // No cameras are installed. Keep this empty while running odometry-only.
-    // Add CameraConfig records here only when vision hardware is installed and enabled above.
-    public static final CameraConfig[] ALL = {};
+    // Robot frame: +X is forward, +Y is left, and +Z is up.  The 27 in. square
+    // chassis puts its side edges at Y = +/-13.5 in.; both cameras are 9 in.
+    // behind the front edge, 7.25 in. above the floor, and tilt 10 deg upward.
+    public static final CameraConfig[] ALL = {
+      new CameraConfig(
+          "Thrifty Left",
+          new Transform3d(
+              Inches.of(4.5),
+              Inches.of(13.5),
+              Inches.of(7.25),
+              new Rotation3d(0.0, Units.degreesToRadians(10.0), Math.PI / 2.0)),
+          1.0,
+          new SimCameraProperties() {
+            {
+              setCalibration(1280, 800, Rotation2d.fromDegrees(120.0));
+              setCalibError(0.25, 0.08);
+              setFPS(120);
+              setAvgLatencyMs(20);
+              setLatencyStdDevMs(5);
+            }
+          }),
+      new CameraConfig(
+          "Thrifty Right",
+          new Transform3d(
+              Inches.of(4.5),
+              Inches.of(-13.5),
+              Inches.of(7.25),
+              new Rotation3d(0.0, Units.degreesToRadians(10.0), -Math.PI / 2.0)),
+          1.0,
+          new SimCameraProperties() {
+            {
+              setCalibration(1280, 800, Rotation2d.fromDegrees(120.0));
+              setCalibError(0.25, 0.08);
+              setFPS(120);
+              setAvgLatencyMs(20);
+              setLatencyStdDevMs(5);
+            }
+          })
+    };
   }
 
   /************************************************************************* */
