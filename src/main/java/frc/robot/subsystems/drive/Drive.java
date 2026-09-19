@@ -799,9 +799,6 @@ public class Drive extends RBSISubsystem {
                   DrivebaseConstants.kDisabledVisionCoastBlendAlpha)
               : DrivebaseConstants.kDisabledVisionBlendAlpha;
 
-      // "Current" for blending target (estimator pose)
-      final Pose2d current = m_PoseEstimator.getEstimatedPosition();
-
       // Debug
       Logger.recordOutput("Vision/Debug/disabledCoast", coast);
       Logger.recordOutput("Vision/Debug/disabledVisionInitialized", disabledVisionInitialized);
@@ -865,16 +862,15 @@ public class Drive extends RBSISubsystem {
       lastDisabledVisionPose = vision;
       lastDisabledVisionTs = t;
 
-      // Blend toward vision -- gentle correction
-      final Pose2d blended = current.interpolate(vision, alpha);
+      // Preserve estimator history after the one initialization snap. Repeated resetPosition calls
+      // discard that history; a timestamped vision update keeps the estimator and pose buffer
+      // aligned at the camera measurement timestamp.
+      m_PoseEstimator.addVisionMeasurement(vision, t, meas.stdDevs());
+      final Pose2d fusedPose = m_PoseEstimator.getEstimatedPosition();
+      poseBufferAddSample(t, fusedPose);
 
-      // Push values to pose estimator and pose buffer
-      m_PoseEstimator.resetPosition(getHeading(), getModulePositions(), blended);
-      markPoseReset(t);
-      poseBufferAddSample(t, blended);
-
-      Logger.recordOutput("Vision/DisabledBlendedPose", blended);
-      Logger.recordOutput("Vision/DisabledBlendAlphaUsed", alpha);
+      Logger.recordOutput("Vision/DisabledBlendedPose", fusedPose);
+      Logger.recordOutput("Vision/DisabledBlendAlphaUsed", 0.0);
 
     } finally {
       odometryLock.unlock();

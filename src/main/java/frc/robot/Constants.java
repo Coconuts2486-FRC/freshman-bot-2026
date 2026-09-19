@@ -298,7 +298,7 @@ public final class Constants {
     public static final double kSlipCurrentAmps = 40.0;
 
     // Characterized Wheel Radius (using the "Drive Wheel Radius Characterization" auto routine)
-    public static final double kWheelRadiusMeters = Inches.of(2.000).in(Meters);
+    public static final double kWheelRadiusMeters = Inches.of(1.900).in(Meters);
 
     // Maximum chassis accelerations desired for robot motion -- metric / radians.
     // Estimate from drivetrain characterization and robot physics, then tune on carpet.
