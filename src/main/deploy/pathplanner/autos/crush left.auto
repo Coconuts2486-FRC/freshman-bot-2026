@@ -7,25 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "cobra murder 1"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.5
+            "pathName": "cursh left"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "cobra murder 2"
+            "pathName": "crush 1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "cobra murder 3"
+            "pathName": "crush end"
           }
         }
       ]

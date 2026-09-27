@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.4050641940085593,
-        "y": 4.300242510699002
+        "x": 3.743112701252236,
+        "y": 3.9457602862254024
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.9910271041369465,
-        "y": 5.400028530670471
+        "x": 3.191449016100179,
+        "y": 5.454722719141323
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.31077032810271,
-        "y": 7.431398002853067
+        "x": 0.7251878354203931,
+        "y": 7.271967799642218
       },
       "prevControl": {
-        "x": 1.7230385164051354,
-        "y": 7.6125392296718974
-      },
-      "nextControl": {
-        "x": 5.215463324024593,
-        "y": 7.368069493138535
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 7.843024251069899,
-        "y": 7.224379457917262
-      },
-      "prevControl": {
-        "x": 7.066704707560627,
-        "y": 8.117146932952924
+        "x": 2.3801788908765644,
+        "y": 7.255742397137746
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "marowak(start)"
+      "linkedName": "crush start"
     }
   ],
   "rotationTargets": [],
@@ -61,7 +45,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "trench push start",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

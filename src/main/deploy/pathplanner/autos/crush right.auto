@@ -5,15 +5,21 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Zero"
+            "pathName": "crush right"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "beedRill(short)"
+            "pathName": "crush 1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "crush end"
           }
         }
       ]

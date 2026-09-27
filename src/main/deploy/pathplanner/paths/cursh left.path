@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.362524964336661,
-        "y": 7.5996005706134095
+        "x": 3.613309481216458,
+        "y": 5.633202146690519
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.362524964336662,
-        "y": 7.5996005706134095
+        "x": 2.9480679785330954,
+        "y": 6.8987835420393555
       },
       "isLocked": false,
-      "linkedName": "left trench start"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.231184022824536,
-        "y": 7.483152639087019
+        "x": 0.7251878354203931,
+        "y": 7.271967799642218
       },
       "prevControl": {
-        "x": 7.231184022824536,
-        "y": 7.483152639087019
+        "x": 2.282826475849733,
+        "y": 7.174615384615385
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "center left stop"
+      "linkedName": "crush start"
     }
   ],
   "rotationTargets": [],
@@ -41,11 +41,11 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 3.0,
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "cobra murder",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
