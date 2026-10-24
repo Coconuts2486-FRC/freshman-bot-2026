@@ -319,7 +319,7 @@ public class RobotContainer {
     // Press X / Square button --> Stop with wheels in X-Lock position
     driverController.xLock().whileTrue(DriveCommands.stopWithX(m_drivebase));
 
-    // Press Y / Triangle button --> Manually Re-Zero the Gyro
+    // Press left bumper / L1 --> Manually re-zero the gyro for the current alliance
     driverController.zeroGyro().onTrue(DriveCommands.zeroHeadingForAlliance(m_drivebase));
 
     // Press RIGHT BUMPER / R1 --> Toggle the extender

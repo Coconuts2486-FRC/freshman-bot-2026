@@ -215,6 +215,9 @@ public class Robot extends LoggedRobot {
       m_autonomousCommand = null;
     }
     m_robotContainer.getDrivebase().setMotorBrake(true);
+    // Field-relative teleop uses an alliance-aware heading. Establish the matching reference
+    // before the default drive command runs so Red does not depend on a manual gyro reset.
+    m_robotContainer.getDrivebase().zeroHeadingForAlliance();
     m_robotContainer.getDrivebase().resetHeadingController();
 
     // In case this got set in sequential practice sessions or whatever
